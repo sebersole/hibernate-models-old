@@ -1,0 +1,23 @@
+apply from: rootProject.file( "gradle/java-module.gradle" )
+
+dependencies {
+    implementation project( ":hibernate-models-common" )
+
+    implementation libs.jandex
+    implementation libs.hcann
+
+    implementation libs.byteBuddy
+    implementation libs.classmate
+
+    implementation libs.logging
+
+    compileOnly libs.loggingAnnotations
+
+    annotationProcessor libs.loggingProcessor
+    annotationProcessor libs.logging
+    annotationProcessor libs.loggingAnnotations
+
+    testImplementation testLibs.jpa
+    testImplementation libs.hibernateCore
+    testRuntimeOnly testLibs.log4j
+}

@@ -1,0 +1,18 @@
+apply plugin: "java-library"
+apply from: rootProject.file( "gradle/module.gradle" )
+
+dependencies {
+	testImplementation testLibs.junit5Api
+	testImplementation testLibs.assertjCore
+
+	testRuntimeOnly testLibs.junit5Engine
+}
+
+test {
+	useJUnitPlatform()
+}
+
+tasks.named( sourceSets.main.compileJavaTaskName ) {
+	options.encoding = "UTF-8"
+	options.warnings false
+}

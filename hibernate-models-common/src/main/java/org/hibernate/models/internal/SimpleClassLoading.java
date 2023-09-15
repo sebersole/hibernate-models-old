@@ -1,0 +1,28 @@
+package org.hibernate.models.internal;
+
+import java.net.URL;
+
+import org.hibernate.models.spi.ClassLoading;
+
+/**
+ * @author Steve Ebersole
+ */
+public class SimpleClassLoading implements ClassLoading {
+	public static final SimpleClassLoading SIMPLE_CLASS_LOADING = new SimpleClassLoading();
+
+	@Override
+	public <T> Class<T> classForName(String name) {
+		try {
+			//noinspection unchecked
+			return (Class<T>) getClass().getClassLoader().loadClass( name );
+		}
+		catch (ClassNotFoundException e) {
+			throw new RuntimeException( e );
+		}
+	}
+
+	@Override
+	public URL locateResource(String resourceName) {
+		return getClass().getClassLoader().getResource( resourceName );
+	}
+}
