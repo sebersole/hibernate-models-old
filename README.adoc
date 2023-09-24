@@ -1,0 +1,15 @@
+:fn-reusability: footnote:[This is a nice-to-have, as opposed to a hard goal]
+
+A work-in-progress look at a more phased approach to how Hibernate reads annotation
+and XML based mapping information.  Specifically here we are looking at the process
+used to build the `org.hibernate.mapping` model - the so-called boot model.
+
+There are a few inter-related goals for this work -
+
+1. More phased approach compared to the current "second pass" approach
+2. Replace HCANN with Jandex for low-level annotation reading
+3. Extended orm.xml support (drop hbm.xml)
+4. Better leverage of "temp class loader"
+5. Re-usability across projects{fn-reusability}
+
+See https://hibernate.atlassian.net/browse/HHH-16114 and  https://github.com/hibernate/hibernate-orm/discussions/5998
