@@ -23,7 +23,15 @@ public class StringHelper {
 		return string == null || string.isBlank();
 	}
 
+	public static boolean isNotBlank(String string) {
+		return string != null && !string.isBlank();
+	}
+
 	public static String nullIfEmpty(String value) {
 		return isEmpty( value ) ? null : value;
+	}
+
+	public static String classNameToResourceName(String className) {
+		return className.replace( '.', '/' ) + ".class";
 	}
 }

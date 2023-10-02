@@ -15,10 +15,9 @@ import org.hibernate.models.orm.spi.HibernateAnnotations;
 import org.hibernate.models.orm.spi.IdentifiableTypeMetadata;
 import org.hibernate.models.orm.spi.JpaAnnotations;
 import org.hibernate.models.source.AnnotationAccessException;
+import org.hibernate.models.source.internal.explicit.AnnotationDescriptorImpl;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
 import org.hibernate.models.source.spi.AnnotationUsage;
-
-import static org.hibernate.models.source.internal.AnnotationDescriptorBuilder.extractAttributeDescriptors;
 
 /**
  * @author Steve Ebersole
@@ -63,11 +62,7 @@ public class AnnotationHelper {
 			AnnotationDescriptor<?> repeatableContainer) {
 		assert javaType != null;
 
-		return new OrmAnnotationDescriptorImpl<>(
-				javaType,
-				extractAttributeDescriptors( javaType ),
-				repeatableContainer
-		);
+		return AnnotationDescriptorImpl.buildDescriptor( javaType, repeatableContainer );
 	}
 
 	public static void forEachOrmAnnotation(Consumer<AnnotationDescriptor<?>> consumer) {

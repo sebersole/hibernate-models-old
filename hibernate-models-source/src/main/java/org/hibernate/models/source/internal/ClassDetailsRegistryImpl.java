@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.models.source.UnknownClassException;
-import org.hibernate.models.source.internal.hcann.ClassDetailsBuilderImpl;
+import org.hibernate.models.source.internal.standard.ClassDetailsBuilderImpl;
 import org.hibernate.models.source.spi.ClassDetails;
 import org.hibernate.models.source.spi.ClassDetailsBuilder;
 import org.hibernate.models.source.spi.ClassDetailsRegistry;
@@ -33,7 +33,7 @@ public class ClassDetailsRegistryImpl implements ClassDetailsRegistry {
 	private final Map<String, List<ClassDetails>> subTypeManagedClassMap = new ConcurrentHashMap<>();
 
 	public ClassDetailsRegistryImpl(SourceModelBuildingContext context) {
-		this( new ClassDetailsBuilderImpl( context ), context );
+		this( ClassDetailsBuilderImpl.DEFAULT_BUILDER, context );
 	}
 
 	public ClassDetailsRegistryImpl(ClassDetailsBuilder fallbackClassDetailsBuilder, SourceModelBuildingContext context) {
@@ -48,7 +48,10 @@ public class ClassDetailsRegistryImpl implements ClassDetailsRegistry {
 	@Override public ClassDetails getClassDetails(String name) {
 		final ClassDetails named = managedClassMap.get( name );
 		if ( named == null ) {
-			throw new UnknownClassException( "Unknown managed class" );
+			if ( "void".equals( name ) ) {
+				return null;
+			}
+ 			throw new UnknownClassException( "Unknown managed class - " + name );
 		}
 		return named;
 	}

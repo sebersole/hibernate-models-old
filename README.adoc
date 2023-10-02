@@ -1,8 +1,11 @@
 :fn-reusability: footnote:[This is a nice-to-have, as opposed to a hard goal]
+== Boot models
 
 A work-in-progress look at a more phased approach to how Hibernate reads annotation
 and XML based mapping information.  Specifically here we are looking at the process
 used to build the `org.hibernate.mapping` model - the so-called boot model.
+
+See https://hibernate.atlassian.net/browse/HHH-16114[HHH-16114] for details and discussion.
 
 There are a few inter-related goals for this work -
 
@@ -12,4 +15,17 @@ There are a few inter-related goals for this work -
 4. Better leverage of "temp class loader"
 5. Re-usability across projects{fn-reusability}
 
-See https://hibernate.atlassian.net/browse/HHH-16114 and  https://github.com/hibernate/hibernate-orm/discussions/5998
+=== The modules
+
+hibernate-models-common::
+    Common stuff - duh
+hibernate-models-source::
+    An abstraction over reflection and annotation
+hibernate-models-intermediate::
+    First set of phases to categorize a domain model -
+        1. Simple categorization of entity v. embeddable v. “simple” class
+        2. Light categorization of attributes
+        3. Application of XML via JAXB - overlay and override
+        4. Normalization of values
+
+Definitely need a better name for `hibernate-models-intermediate`

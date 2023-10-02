@@ -37,12 +37,12 @@ public interface AnnotationUsage<A extends Annotation> {
 	/**
 	 * The value of the named annotation attribute
 	 */
-	<V,W> AnnotationAttributeValue<V,W> getAttributeValue(String name);
+	<W> AnnotationAttributeValue<W> getAttributeValue(String name);
 
 	/**
 	 * The value of the named annotation attribute
 	 */
-	<V,W> AnnotationAttributeValue<V,W> getAttributeValue(AnnotationAttributeDescriptor<A,V,W> attributeDescriptor);
+	<V> AnnotationAttributeValue<V> getAttributeValue(AnnotationAttributeDescriptor attributeDescriptor);
 
 	default <X> X extractAttributeValue(String name) {
 		return AnnotationUsageHelper.extractValue( this, name );

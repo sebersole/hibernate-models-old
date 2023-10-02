@@ -9,11 +9,11 @@ package org.hibernate.models.source.spi;
 /**
  * The descriptor for the value of a particular attribute for an annotation usage
  */
-public interface AnnotationAttributeValue<V,W> {
+public interface AnnotationAttributeValue<W> {
 	/**
 	 * Descriptor for the attribute for which this is a value
 	 */
-	AnnotationAttributeDescriptor<?,V,W> getAttributeDescriptor();
+	AnnotationAttributeDescriptor getAttributeDescriptor();
 
 	/**
 	 * The value
@@ -23,25 +23,23 @@ public interface AnnotationAttributeValue<V,W> {
 	<X> X getValue(Class<X> type);
 
 	default String asString() {
-		final W value = getValue();
-		return value == null ? null : value.toString();
+		return getValue( String.class );
 	}
 
-	default boolean asBoolean() {
-		return getValue( boolean.class );
+	default Integer asInteger() {
+		return getValue( Integer.class );
 	}
 
-	default int asInt() {
-		return getValue( int.class );
+	default Boolean asBoolean() {
+		return getValue( Boolean.class );
 	}
 
 	/**
-	 * Whether the value is a default.
+	 * Whether the value is implicit (the default), or was explicitly specified
 	 *
-	 * @implNote Best guess at the moment since HCANN is unable to make
-	 * 		this distinction.  This will be better handled once we can migrate
-	 * 		to using Jandex for annotations.  See
-	 * 		<a href="https://hibernate.atlassian.net/browse/HHH-9489">HHH-9489</a> (Migrate from commons-annotations to Jandex).
+	 * @return {@code true} indicates that the attribute's value is
+	 * the default; {@code false} indicates the attribute was explicitly
+	 * specified
 	 */
-	boolean isDefaultValue();
+	boolean isImplicit();
 }

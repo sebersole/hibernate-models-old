@@ -9,11 +9,14 @@ package org.hibernate.models.spi;
 
 import java.net.URL;
 
+import org.hibernate.models.Incubating;
+
 /**
  * Access to load resources from a ClassLoader
  *
  * @author Steve Ebersole
  */
+@Incubating
 public interface ClassLoading {
 	/**
 	 * Obtain a {@link Class} reference by name

@@ -61,6 +61,7 @@ import jakarta.persistence.Version;
 import static jakarta.persistence.AccessType.PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.models.orm.TestHelper.buildHierarchies;
+import static org.hibernate.models.orm.TestHelper.createBuildingContext;
 import static org.hibernate.models.orm.spi.AttributeMetadata.AttributeNature.ANY;
 import static org.hibernate.models.orm.spi.AttributeMetadata.AttributeNature.BASIC;
 import static org.hibernate.models.orm.spi.AttributeMetadata.AttributeNature.EMBEDDED;
@@ -126,7 +127,13 @@ public class AttributeMetadataSmokeTests {
 
 	@Test
 	void testClassifications() {
-		final SourceModelBuildingContext buildingContext = TestHelper.buildProcessingContext();
+		final SourceModelBuildingContext buildingContext = createBuildingContext(
+				Container.class,
+				org.hibernate.type.descriptor.java.AbstractClassJavaType.class,
+				StringJavaType.class,
+				org.hibernate.type.descriptor.jdbc.AdjustableJdbcType.class,
+				VarcharJdbcType.class
+		);
 		final Set<EntityHierarchy> entityHierarchies = buildHierarchies( buildingContext, Container.class );
 		assertThat( entityHierarchies ).hasSize( 1 );
 
@@ -187,7 +194,10 @@ public class AttributeMetadataSmokeTests {
 
 	@Test
 	void testCollectionsAsBasic() {
-		final SourceModelBuildingContext buildingContext = TestHelper.buildProcessingContext();
+		final SourceModelBuildingContext buildingContext = createBuildingContext(
+				CollectionsAsBasicEntity.class,
+				ListConverter.class
+		);
 		final ClassDetails integerDescriptor = buildingContext
 				.getClassDetailsRegistry()
 				.getClassDetails( Integer.class.getName() );

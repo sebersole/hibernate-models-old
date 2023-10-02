@@ -34,18 +34,20 @@ import java.util.function.Consumer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.models.internal.CollectionHelper;
 import org.hibernate.models.source.ModelsException;
-import org.hibernate.models.source.internal.reflection.ClassDetailsBuilderImpl;
-import org.hibernate.models.source.internal.reflection.ClassDetailsImpl;
+import org.hibernate.models.source.UnknownClassException;
+import org.hibernate.models.source.internal.standard.ClassDetailsBuilderImpl;
+import org.hibernate.models.source.internal.standard.ClassDetailsImpl;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
 import org.hibernate.models.source.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.source.spi.AnnotationUsage;
 import org.hibernate.models.source.spi.ClassDetails;
 import org.hibernate.models.source.spi.ClassDetailsRegistry;
-import org.hibernate.models.spi.ClassLoading;
 import org.hibernate.models.source.spi.ClassmateContext;
 import org.hibernate.models.source.spi.RegistryPrimer;
 import org.hibernate.models.source.spi.SourceModelBuildingContext;
+import org.hibernate.models.spi.ClassLoading;
 
+import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.IndexView;
 
 /**
@@ -244,12 +246,16 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 		public <A extends Annotation> void registerAnnotation(AnnotationDescriptor<A> descriptor) {
 			descriptorRegistry.register( descriptor );
 
-			registerClass(
-					new ClassDetailsImpl(
-							descriptor.getAnnotationType(),
-							SourceModelBuildingContextImpl.this
-					)
-			);
+			final ClassInfo classInfo = jandexIndex.getClassByName( descriptor.getAnnotationType() );
+			if ( classInfo == null ) {
+				throw new UnknownClassException(
+						"Unable to locate class in Jandex index - " + descriptor.getAnnotationType().getName()
+				);
+			}
+			registerClass( new ClassDetailsImpl(
+					classInfo,
+					SourceModelBuildingContextImpl.this
+			) );
 		}
 
 		@Override

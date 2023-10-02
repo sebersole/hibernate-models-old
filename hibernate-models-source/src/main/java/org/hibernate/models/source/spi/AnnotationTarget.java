@@ -47,6 +47,11 @@ public interface AnnotationTarget {
 	<A extends Annotation> AnnotationUsage<A> getAnnotation(AnnotationDescriptor<A> type);
 
 	/**
+	 * Helper form of {@link #getAnnotation(AnnotationDescriptor)}
+	 */
+	<A extends Annotation> AnnotationUsage<A> getAnnotation(Class<A> type);
+
+	/**
 	 * For {@linkplain Repeatable repeatable} annotation types, this method will return a list
 	 * of all the annotations on the target, even those on the {@linkplain Repeatable#value() "containing annotation"} -<ul>
 	 *     <li>
@@ -67,6 +72,11 @@ public interface AnnotationTarget {
 	<A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotations(AnnotationDescriptor<A> type);
 
 	/**
+	 * Helper form of {@linkplain #getRepeatedAnnotations(AnnotationDescriptor)}
+	 */
+	<A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotations(Class<A> type);
+
+	/**
 	 * Call the {@code consumer} for each {@linkplain AnnotationUsage usage} of the
 	 * given {@code type}.
 	 *
@@ -74,6 +84,11 @@ public interface AnnotationTarget {
 	 * called for those defined on the container.
 	 */
 	<X extends Annotation> void forEachAnnotation(AnnotationDescriptor<X> type, Consumer<AnnotationUsage<X>> consumer);
+
+	/**
+	 * Helper form of {@link #forEachAnnotation(AnnotationDescriptor, Consumer)}
+	 */
+	<X extends Annotation> void forEachAnnotation(Class<X> type, Consumer<AnnotationUsage<X>> consumer);
 
 	/**
 	 * Get a usage of the given annotation {@code type} whose {@code attributeToMatch} attribute value
@@ -88,6 +103,15 @@ public interface AnnotationTarget {
 	}
 
 	/**
+	 * Helper form of {@linkplain #getNamedAnnotation(AnnotationDescriptor, String)}
+	 */
+	default <X extends Annotation> AnnotationUsage<X> getNamedAnnotation(
+			Class<X> type,
+			String matchName) {
+		return getNamedAnnotation( type, matchName, "name" );
+	}
+
+	/**
 	 * Get a usage of the given annotation {@code type} whose {@code attributeToMatch} attribute value
 	 * matches the given {@code matchName}.
 	 *
@@ -96,6 +120,14 @@ public interface AnnotationTarget {
 	 */
 	<X extends Annotation> AnnotationUsage<X> getNamedAnnotation(
 			AnnotationDescriptor<X> type,
+			String matchName,
+			String attributeToMatch);
+
+	/**
+	 * Helper form of {@linkplain #getNamedAnnotation(AnnotationDescriptor, String, String)}
+	 */
+	<X extends Annotation> AnnotationUsage<X> getNamedAnnotation(
+			Class<X> type,
 			String matchName,
 			String attributeToMatch);
 

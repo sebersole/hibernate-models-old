@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.internal;
 
+import java.lang.instrument.UnmodifiableClassException;
 import java.net.URL;
 
 import org.hibernate.models.spi.ClassLoading;
@@ -23,7 +24,7 @@ public class SimpleClassLoading implements ClassLoading {
 			return (Class<T>) getClass().getClassLoader().loadClass( name );
 		}
 		catch (ClassNotFoundException e) {
-			throw new RuntimeException( e );
+			throw new RuntimeException( "Unable to locate class - " + name, e );
 		}
 	}
 

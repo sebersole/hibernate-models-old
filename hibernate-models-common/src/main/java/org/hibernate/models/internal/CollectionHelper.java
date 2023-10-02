@@ -7,8 +7,11 @@
 
 package org.hibernate.models.internal;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,4 +54,19 @@ public class CollectionHelper {
 		return new ArrayList<>( Math.max( expectedNumberOfElements + 1, DEFAULT_LIST_CAPACITY ) );
 	}
 
+	public static <E> List<E> join(List<E> first, List<E> second) {
+		final int totalCount = ( first == null ? 0 : first.size() )
+				+ ( second == null ? 0 : second.size() );
+		if ( totalCount == 0 ) {
+			return Collections.emptyList();
+		}
+		final ArrayList<E> joined = new ArrayList<>( totalCount );
+		if ( first != null ) {
+			joined.addAll( first );
+		}
+		if ( second != null ) {
+			joined.addAll( second );
+		}
+		return joined;
+	}
 }

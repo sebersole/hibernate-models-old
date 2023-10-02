@@ -53,7 +53,7 @@ public class Caching {
 					cacheAnnotation,
 					"includeLazy",
 					() -> {
-						final String include = cacheAnnotation.getAttributeValue( "include" ).asString();
+						final String include = cacheAnnotation.getAttributeValue( "include" ).getValue( String.class );
 						assert "all".equals( include ) || "non-lazy".equals( include );
 						return include.equals( "all" );
 					}
@@ -61,7 +61,7 @@ public class Caching {
 		}
 	}
 
-	private static AccessType interpretAccessType(AnnotationAttributeValue<CacheConcurrencyStrategy,CacheConcurrencyStrategy> usageValue, AccessType implicitValue) {
+	private static AccessType interpretAccessType(AnnotationAttributeValue<CacheConcurrencyStrategy> usageValue, AccessType implicitValue) {
 		if ( usageValue != null ) {
 			final CacheConcurrencyStrategy strategy = usageValue.getValue();
 			return strategy.toAccessType();

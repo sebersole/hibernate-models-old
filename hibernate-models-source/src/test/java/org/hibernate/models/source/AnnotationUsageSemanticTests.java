@@ -8,8 +8,8 @@ package org.hibernate.models.source;
 
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.models.source.internal.hcann.ClassDetailsImpl;
-import org.hibernate.models.source.internal.reflection.ClassDetailsBuilderImpl;
+import org.hibernate.models.source.internal.standard.ClassDetailsBuilderImpl;
+import org.hibernate.models.source.internal.standard.ClassDetailsImpl;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
 import org.hibernate.models.source.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.source.spi.ClassDetails;
@@ -19,6 +19,7 @@ import org.hibernate.models.source.spi.SourceModelBuildingContext;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.models.source.TestHelper.createBuildingContext;
 
 /**
  * Tests that accessing annotation (usages) works consistently between
@@ -76,8 +77,15 @@ public class AnnotationUsageSemanticTests {
 	}
 
 	@Test
-	void hcannSourceModelAssertions() {
-		final SourceModelBuildingContext processingContext = TestHelper.buildProcessingContext();
+	void jandexSourceModelAssertions() {
+		final SourceModelBuildingContext processingContext = TestHelper.createBuildingContext(
+				CustomMetaAnnotation.class,
+				CustomAnnotation.class,
+				CustomAnnotations.class,
+				Whatever.class,
+				Something.class,
+				SomethingExtra.class
+		);
 		final AnnotationDescriptorRegistry annotationDescriptorRegistry = processingContext.getAnnotationDescriptorRegistry();
 		final ClassDetailsRegistry classDetailsRegistry = processingContext.getClassDetailsRegistry();
 
@@ -108,17 +116,25 @@ public class AnnotationUsageSemanticTests {
 
 	@Test
 	void reflectionSourceModelAssertions() {
-		final SourceModelBuildingContext processingContext = TestHelper.buildProcessingContext();
-		final AnnotationDescriptorRegistry annotationDescriptorRegistry = processingContext.getAnnotationDescriptorRegistry();
-		final ClassDetailsRegistry classDetailsRegistry = processingContext.getClassDetailsRegistry();
+		final SourceModelBuildingContext buildingContext = createBuildingContext(
+				SimpleEntity.class,
+				Whatever.class,
+				Something.class,
+				SomethingExtra.class,
+				CustomAnnotation.class,
+				CustomAnnotations.class,
+				CustomMetaAnnotation.class
+		);
+		final AnnotationDescriptorRegistry annotationDescriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
+		final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
 
 		final AnnotationDescriptor<CustomMetaAnnotation> customMetaAnnotation = annotationDescriptorRegistry.getDescriptor( CustomMetaAnnotation.class );
 		final AnnotationDescriptor<CustomAnnotation> customAnnotation = annotationDescriptorRegistry.getDescriptor( CustomAnnotation.class );
 		final AnnotationDescriptor<CustomAnnotations> customsAnnotation = annotationDescriptorRegistry.getDescriptor( CustomAnnotations.class );
 
-		final ClassDetails whateverClass = classDetailsRegistry.resolveClassDetails( Whatever.class.getName(), ClassDetailsBuilderImpl.INSTANCE );
-		final ClassDetails somethingClass = classDetailsRegistry.resolveClassDetails( Something.class.getName(), ClassDetailsBuilderImpl.INSTANCE );
-		final ClassDetails somethingExtraClass = classDetailsRegistry.resolveClassDetails( SomethingExtra.class.getName(), ClassDetailsBuilderImpl.INSTANCE );
+		final ClassDetails whateverClass = classDetailsRegistry.resolveClassDetails( Whatever.class.getName(), ClassDetailsBuilderImpl.DEFAULT_BUILDER );
+		final ClassDetails somethingClass = classDetailsRegistry.resolveClassDetails( Something.class.getName(), ClassDetailsBuilderImpl.DEFAULT_BUILDER );
+		final ClassDetails somethingExtraClass = classDetailsRegistry.resolveClassDetails( SomethingExtra.class.getName(), ClassDetailsBuilderImpl.DEFAULT_BUILDER );
 
 		// meta-annotations
 		assertThat( whateverClass.getAnnotation( customMetaAnnotation ) ).isNull();

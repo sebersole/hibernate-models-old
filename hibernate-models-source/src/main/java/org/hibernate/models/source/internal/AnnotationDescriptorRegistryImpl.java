@@ -11,6 +11,7 @@ import java.lang.annotation.Repeatable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.hibernate.models.source.internal.standard.annotations.AnnotationDescriptorImpl;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
 import org.hibernate.models.source.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.source.spi.SourceModelBuildingContext;
@@ -38,10 +39,6 @@ public class AnnotationDescriptorRegistryImpl implements AnnotationDescriptorReg
 		}
 	}
 
-	/**
-	 * For the given annotation type, get the corresponding
-	 * {@linkplain OrmAnnotationDescriptorImpl descriptor}
-	 */
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> getDescriptor(Class<A> javaType) {
 		//noinspection unchecked
@@ -51,12 +48,12 @@ public class AnnotationDescriptorRegistryImpl implements AnnotationDescriptorReg
 		}
 
 		// indicates a non-JPA and non-Hibernate annotation.  we need to track these for meta-annotation handling later.
-		final AnnotationDescriptor<A> created = createAdHocAnnotationDescriptor( javaType );
+		final AnnotationDescriptor<A> created = buildAdHocAnnotationDescriptor( javaType );
 		descriptorMap.put( javaType, created );
 		return created;
 	}
 
-	private <A extends Annotation> AnnotationDescriptor<A> createAdHocAnnotationDescriptor(Class<A> javaType) {
+	private <A extends Annotation> AnnotationDescriptor<A> buildAdHocAnnotationDescriptor(Class<A> javaType) {
 		final Repeatable repeatable = javaType.getAnnotation( Repeatable.class );
 		final AnnotationDescriptor<? extends Annotation> containerDescriptor;
 		if ( repeatable != null ) {

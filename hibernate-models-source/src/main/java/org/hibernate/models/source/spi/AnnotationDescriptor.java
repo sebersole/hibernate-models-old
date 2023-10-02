@@ -11,7 +11,7 @@ import java.lang.annotation.Repeatable;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.hibernate.models.source.internal.AnnotationDescriptorImpl;
+import org.hibernate.models.source.internal.standard.annotations.AnnotationDescriptorImpl;
 
 /**
  * Describes an annotation type (the Class)
@@ -42,12 +42,12 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	/**
 	 * Descriptors for the attributes of the annotation
 	 */
-	List<AnnotationAttributeDescriptor<A,?,?>> getAttributes();
+	List<AnnotationAttributeDescriptor> getAttributes();
 
 	/**
 	 * Get the attribute descriptor for the named attribute
 	 */
-	<V,W> AnnotationAttributeDescriptor<A,V,W> getAttribute(String name);
+	AnnotationAttributeDescriptor getAttribute(String name);
 
 	default boolean isRepeatable() {
 		return getRepeatableContainer() != null;
@@ -60,7 +60,7 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	AnnotationDescriptor<?> getRepeatableContainer();
 
 
-	static  <A extends Annotation> AnnotationDescriptor<A> createDescriptor(
+	static <A extends Annotation> AnnotationDescriptor<A> createDescriptor(
 			Class<A> javaType,
 			SourceModelBuildingContext buildingContext) {
 		final Repeatable repeatable = javaType.getAnnotation( Repeatable.class );

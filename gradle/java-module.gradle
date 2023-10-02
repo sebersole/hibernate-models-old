@@ -8,6 +8,14 @@ dependencies {
 	testRuntimeOnly testLibs.junit5Engine
 }
 
+java {
+	sourceCompatibility = 11
+	targetCompatibility = 11
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(11)
+	}
+}
+
 test {
 	useJUnitPlatform()
 }

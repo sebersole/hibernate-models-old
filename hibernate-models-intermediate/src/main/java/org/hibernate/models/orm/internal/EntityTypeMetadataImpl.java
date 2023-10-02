@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.boot.model.naming.EntityNaming;
+import org.hibernate.models.internal.StringHelper;
 import org.hibernate.models.orm.spi.AttributeMetadata;
 import org.hibernate.models.orm.spi.EntityHierarchy;
 import org.hibernate.models.orm.spi.EntityTypeMetadata;
@@ -153,7 +154,7 @@ public class EntityTypeMetadataImpl
 
 	private String determineJpaEntityName(AnnotationUsage<Entity> entityAnnotation, String entityName) {
 		final String name = AnnotationUsageHelper.extractValue( entityAnnotation, "name" );
-		if ( name != null ) {
+		if ( StringHelper.isNotEmpty( name ) ) {
 			return name;
 		}
 		return unqualify( entityName );

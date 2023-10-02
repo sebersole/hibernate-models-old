@@ -14,8 +14,7 @@ import org.hibernate.models.source.spi.AnnotationUsage;
 
 
 /**
- * Specialization of AnnotationTarget where the annotations are not known up
- * front.  Rather, they are {@linkplain  #apply applied} later
+ * Specialization of AnnotationTarget for dynamic models
  *
  * @author Steve Ebersole
  */
@@ -23,8 +22,4 @@ public interface DynamicAnnotationTarget extends AnnotationTarget {
 	<X extends Annotation> void apply(List<AnnotationUsage<X>> annotationUsages);
 
 	<X extends Annotation> void apply(AnnotationUsage<X> annotationUsage);
-
-	void apply(Annotation[] annotations);
-
-	void apply(Annotation annotation);
 }

@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 
 import org.hibernate.models.source.AnnotationAccessException;
 import org.hibernate.models.source.internal.AnnotationUsageHelper;
-import org.hibernate.models.source.internal.AnnotationUsageImpl;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
 import org.hibernate.models.source.spi.AnnotationUsage;
 import org.hibernate.models.source.spi.SourceModelBuildingContext;
@@ -28,11 +27,11 @@ import static org.hibernate.models.source.spi.AnnotationAttributeDescriptor.VALU
  * @author Steve Ebersole
  */
 public abstract class AbstractDynamicAnnotationTarget implements DynamicAnnotationTarget {
-	private final SourceModelBuildingContext processingContext;
+	private final SourceModelBuildingContext buildingContext;
 	private final Map<Class<? extends Annotation>,AnnotationUsage<?>> usagesMap = new HashMap<>();
 
-	public AbstractDynamicAnnotationTarget(SourceModelBuildingContext processingContext) {
-		this.processingContext = processingContext;
+	public AbstractDynamicAnnotationTarget(SourceModelBuildingContext buildingContext) {
+		this.buildingContext = buildingContext;
 	}
 
 	@Override
@@ -62,28 +61,15 @@ public abstract class AbstractDynamicAnnotationTarget implements DynamicAnnotati
 	}
 
 	@Override
-	public void apply(Annotation[] annotations) {
-		// todo (annotation-source) : handle meta-annotations
-		for ( int i = 0; i < annotations.length; i++ ) {
-			apply( annotations[i] );
-		}
-	}
-
-	@Override
-	public void apply(Annotation annotation) {
-		//noinspection rawtypes,unchecked
-		final AnnotationUsageImpl usage = new AnnotationUsageImpl(
-				annotation,
-				processingContext.getAnnotationDescriptorRegistry().getDescriptor( annotation.annotationType() ),
-				this,
-				processingContext
-		);
-		apply( usage );
-	}
-
-	@Override
 	public <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotations(AnnotationDescriptor<A> type) {
 		return AnnotationUsageHelper.getRepeatedAnnotations( type, usagesMap );
+	}
+
+	@Override
+	public <A extends Annotation> List<AnnotationUsage<A>> getRepeatedAnnotations(Class<A> type) {
+		return getRepeatedAnnotations(
+				buildingContext.getAnnotationDescriptorRegistry().getDescriptor( type )
+		);
 	}
 
 	@Override
@@ -112,9 +98,24 @@ public abstract class AbstractDynamicAnnotationTarget implements DynamicAnnotati
 	}
 
 	@Override
+	public <X extends Annotation> void forEachAnnotation(Class<X> type, Consumer<AnnotationUsage<X>> consumer) {
+		forEachAnnotation(
+				buildingContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
+				consumer
+		);
+	}
+
+	@Override
 	public <A extends Annotation> AnnotationUsage<A> getAnnotation(AnnotationDescriptor<A> type) {
 		//noinspection unchecked
 		return (AnnotationUsage<A>) usagesMap.get( type.getAnnotationType() );
+	}
+
+	@Override
+	public <A extends Annotation> AnnotationUsage<A> getAnnotation(Class<A> type) {
+		return getAnnotation(
+				buildingContext.getAnnotationDescriptorRegistry().getDescriptor( type )
+		);
 	}
 
 	@Override
@@ -127,5 +128,17 @@ public abstract class AbstractDynamicAnnotationTarget implements DynamicAnnotati
 		}
 
 		return AnnotationUsageHelper.getNamedAnnotation( type, matchValue, attributeToMatch, usagesMap );
+	}
+
+	@Override
+	public <X extends Annotation> AnnotationUsage<X> getNamedAnnotation(
+			Class<X> type,
+			String matchName,
+			String attributeToMatch) {
+		return getNamedAnnotation(
+				buildingContext.getAnnotationDescriptorRegistry().getDescriptor( type ),
+				matchName,
+				attributeToMatch
+		);
 	}
 }

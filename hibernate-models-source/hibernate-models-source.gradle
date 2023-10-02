@@ -12,6 +12,8 @@ dependencies {
     implementation libs.logging
 
     compileOnly libs.loggingAnnotations
+    compileOnly libs.jpa
+    compileOnly libs.hibernateCore
 
     annotationProcessor libs.loggingProcessor
     annotationProcessor libs.logging

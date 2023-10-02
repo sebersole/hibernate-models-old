@@ -195,16 +195,6 @@ public interface JpaAnnotations {
 	AnnotationDescriptor<UniqueConstraint> UNIQUE_CONSTRAINT = createOrmDescriptor( UniqueConstraint.class );
 	AnnotationDescriptor<Version> VERSION = createOrmDescriptor( Version.class );
 
-
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// Not sure if we need these
-
-	AnnotationDescriptor<PersistenceProperty> PERSISTENCE_PROPERTY = createOrmDescriptor( PersistenceProperty.class );
-	AnnotationDescriptor<PersistenceUnits> PERSISTENCE_UNITS = createOrmDescriptor( PersistenceUnits.class );
-	AnnotationDescriptor<PersistenceContexts> PERSISTENCE_CONTEXTS = createOrmDescriptor( PersistenceContexts.class );
-	AnnotationDescriptor<PersistenceContext> PERSISTENCE_CONTEXT = createOrmDescriptor( PersistenceContext.class, PERSISTENCE_CONTEXTS );
-	AnnotationDescriptor<PersistenceUnit> PERSISTENCE_UNIT = createOrmDescriptor( PersistenceUnit.class, PERSISTENCE_UNITS );
-
 	/**
 	 * Consume each defined AnnotationDescriptor.
 	 */

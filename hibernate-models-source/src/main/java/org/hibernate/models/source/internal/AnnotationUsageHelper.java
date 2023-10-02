@@ -7,17 +7,13 @@
 package org.hibernate.models.source.internal;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.models.internal.CollectionHelper;
-import org.hibernate.models.source.AnnotationAccessException;
 import org.hibernate.models.source.spi.AnnotationAttributeDescriptor;
 import org.hibernate.models.source.spi.AnnotationAttributeValue;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
@@ -33,8 +29,6 @@ import org.hibernate.models.source.spi.AnnotationUsage;
  * </ul>
  *
  * @see AnnotationHelper
- * @see AnnotationDescriptorBuilder
- * @see AnnotationUsageBuilder
  *
  * @author Steve Ebersole
  */
@@ -97,7 +91,7 @@ public class AnnotationUsageHelper {
 		if ( containerType != null ) {
 			final AnnotationUsage<?> containerUsage = usageMap.get( containerType.getAnnotationType() );
 			if ( containerUsage != null ) {
-				final AnnotationAttributeValue<?,List<AnnotationUsage<A>>> attributeValue = containerUsage.getAttributeValue( "value" );
+				final AnnotationAttributeValue<List<AnnotationUsage<A>>> attributeValue = containerUsage.getAttributeValue( "value" );
 				if ( attributeValue != null ) {
 					final List<AnnotationUsage<A>> repeatedUsages = attributeValue.getValue();
 					for ( int i = 0; i < repeatedUsages.size(); i++ ) {
@@ -114,11 +108,11 @@ public class AnnotationUsageHelper {
 	}
 
 	private static boolean nameMatches(AnnotationUsage<?> annotationUsage, String matchValue, String attributeToMatch) {
-		final AnnotationAttributeValue<String,String> attributeValue = annotationUsage.getAttributeValue( attributeToMatch );
+		final AnnotationAttributeValue<String> attributeValue = annotationUsage.getAttributeValue( attributeToMatch );
 		return attributeValue != null && matchValue.equals( attributeValue.getValue() );
 	}
 
-	public static <V,W> AnnotationAttributeValue<V,W> extractValueWrapper(AnnotationUsage<?> usage, String attributeName) {
+	public static <V> AnnotationAttributeValue<V> extractValueWrapper(AnnotationUsage<?> usage, String attributeName) {
 		if ( usage == null ) {
 			return null;
 		}
@@ -130,13 +124,12 @@ public class AnnotationUsageHelper {
 			return null;
 		}
 
-		final AnnotationAttributeValue<?,X> value = extractValueWrapper( usage, attributeName );
-		if ( value == null ) {
-			//noinspection unchecked
-			return (X) usage.getAnnotationDescriptor().getAttribute( attributeName ).getAttributeDefault();
+		final AnnotationAttributeValue<X> wrapper = usage.getAttributeValue( attributeName );
+		if ( wrapper == null ) {
+			return null;
 		}
 
-		return value.getValue();
+		return wrapper.getValue();
 	}
 
 	public static <X> X extractValue(AnnotationUsage<?> usage, String attributeName, X implicitValue) {
@@ -144,13 +137,12 @@ public class AnnotationUsageHelper {
 			return implicitValue;
 		}
 
-		final AnnotationAttributeValue<?,X> value = extractValueWrapper( usage, attributeName );
+		final AnnotationAttributeValue<X> value = extractValueWrapper( usage, attributeName );
 		if ( value == null ) {
-			//noinspection unchecked
-			return (X) usage.getAnnotationDescriptor().getAttribute( attributeName ).getAttributeDefault();
+			return implicitValue;
 		}
 
-		if ( value.isDefaultValue() ) {
+		if ( value.isImplicit() ) {
 			return implicitValue;
 		}
 
@@ -161,8 +153,8 @@ public class AnnotationUsageHelper {
 		return extractValue( extractValueWrapper( usage, attributeName ), defaultValueSupplier );
 	}
 
-	public static <X> X extractValue(AnnotationAttributeValue<?,X> attributeValue, Supplier<X> defaultValueSupplier) {
-		if ( attributeValue == null || attributeValue.isDefaultValue() ) {
+	public static <X> X extractValue(AnnotationAttributeValue<X> attributeValue, Supplier<X> defaultValueSupplier) {
+		if ( attributeValue == null || attributeValue.isImplicit() ) {
 			return defaultValueSupplier.get();
 		}
 		return attributeValue.getValue();
