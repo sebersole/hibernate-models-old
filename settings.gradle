@@ -23,9 +23,6 @@ dependencyResolutionManagement {
 			library( "hibernateCore", "org.hibernate.orm", "hibernate-core" ).versionRef( hibernateVersion )
 			library( "hibernatePlatform", "org.hibernate.orm", "hibernate-platform" ).versionRef( hibernateVersion )
 
-			def hcannVersion = version "hcann", "6.0.6.Final"
-			library( "hcann", "org.hibernate.common", "hibernate-commons-annotations" ).versionRef( hcannVersion )
-
 			def jacksonVersion = version "jackson", "2.14.1"
 			library( "jackson", "com.fasterxml.jackson.core", "jackson-databind" ).versionRef( jacksonVersion )
 			library( "jacksonXml", "com.fasterxml.jackson.dataformat", "jackson-dataformat-xml" ).versionRef( jacksonVersion )

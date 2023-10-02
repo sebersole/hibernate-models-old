@@ -42,14 +42,34 @@ public class EntityHierarchyBuilder {
 	 * to the metamodel.
 	 *
 	 * @param typeConsumer Callback for any identifiable-type metadata references
-	 * @param processingContext The binding context, giving access to needed services and information
+	 * @param buildingContext The binding context, giving access to needed services and information
+	 *
+	 * @return a set of {@code EntityHierarchySource} instances.
+	 */
+	public static Set<EntityHierarchy> createEntityHierarchies(
+			Set<ClassDetails> rootEntities,
+			Consumer<IdentifiableTypeMetadata> typeConsumer,
+			OrmModelBuildingContext buildingContext) {
+		return new EntityHierarchyBuilder( buildingContext ).process( rootEntities, typeConsumer );
+	}
+
+	/**
+	 * Pre-processes the annotated entities from the index and create a set of entity hierarchies which can be bound
+	 * to the metamodel.
+	 *
+	 * @param typeConsumer Callback for any identifiable-type metadata references
+	 * @param buildingContext The binding context, giving access to needed services and information
 	 *
 	 * @return a set of {@code EntityHierarchySource} instances.
 	 */
 	public static Set<EntityHierarchy> createEntityHierarchies(
 			Consumer<IdentifiableTypeMetadata> typeConsumer,
-			OrmModelBuildingContext processingContext) {
-		return new EntityHierarchyBuilder( processingContext ).process( typeConsumer );
+			OrmModelBuildingContext buildingContext) {
+		return createEntityHierarchies(
+				collectRootEntityTypes( buildingContext.getSourceModel().getClassDetailsRegistry() ),
+				typeConsumer,
+				buildingContext
+		);
 	}
 
 	private final OrmModelBuildingContext modelContext;
@@ -60,14 +80,18 @@ public class EntityHierarchyBuilder {
 		this.modelContext = modelContext;
 	}
 
-	private Set<EntityHierarchy> process(Consumer<IdentifiableTypeMetadata> typeConsumer) {
-		final Set<ClassDetails> rootEntityClassDetails = collectRootEntityTypes();
-		final Set<EntityHierarchy> hierarchies = CollectionHelper.setOfSize( rootEntityClassDetails.size() );
+	private Set<EntityHierarchy> process(
+			Set<ClassDetails> rootEntities,
+			Consumer<IdentifiableTypeMetadata> typeConsumer) {
+		final Set<EntityHierarchy> hierarchies = CollectionHelper.setOfSize( rootEntities.size() );
 
-		rootEntityClassDetails.forEach( (rootEntityManagedClass) -> {
-			final AccessType defaultAccessType = determineDefaultAccessTypeForHierarchy( rootEntityManagedClass );
-			hierarchies.add( new EntityHierarchyImpl( rootEntityManagedClass, defaultAccessType, typeConsumer,
-													  modelContext
+		rootEntities.forEach( (rootEntity) -> {
+			final AccessType defaultAccessType = determineDefaultAccessTypeForHierarchy( rootEntity );
+			hierarchies.add( new EntityHierarchyImpl(
+					rootEntity,
+					defaultAccessType,
+					typeConsumer,
+					modelContext
 			) );
 		} );
 
@@ -171,26 +195,23 @@ public class EntityHierarchyBuilder {
 	}
 
 	private Set<ClassDetails> collectRootEntityTypes() {
+		return collectRootEntityTypes( modelContext.getSourceModel().getClassDetailsRegistry() );
+	}
+
+	private static Set<ClassDetails> collectRootEntityTypes(ClassDetailsRegistry classDetailsRegistry) {
 		final Set<ClassDetails> collectedTypes = new HashSet<>();
 
-		// todo (annotation-source) : have this handle other types such as converters, etc
-
-		final ClassDetailsRegistry classDetailsRegistry = modelContext.getSourceModel().getClassDetailsRegistry();
 		classDetailsRegistry.forEachClassDetails( (managedType) -> {
-			if ( managedType.getAnnotation( JpaAnnotations.MAPPED_SUPERCLASS ) != null ) {
-				allKnownMappedSuperclassTypes.add( managedType );
-			}
-			else if ( managedType.getAnnotation( JpaAnnotations.ENTITY ) != null ) {
-				if ( isRoot( managedType ) ) {
-					collectedTypes.add( managedType );
-				}
+			if ( managedType.getAnnotation( JpaAnnotations.ENTITY ) != null
+					&& isRoot( managedType ) ) {
+				collectedTypes.add( managedType );
 			}
 		} );
 
 		return collectedTypes;
 	}
 
-	private boolean isRoot(ClassDetails classInfo) {
+	public static boolean isRoot(ClassDetails classInfo) {
 		// perform a series of opt-out checks against the super-type hierarchy
 
 		// an entity is considered a root of the hierarchy if:
@@ -219,7 +240,10 @@ public class EntityHierarchyBuilder {
 	 * Used in tests
 	 */
 	public static Set<EntityHierarchy> createEntityHierarchies(OrmModelBuildingContext processingContext) {
-		return new EntityHierarchyBuilder( processingContext ).process( EntityHierarchyBuilder::ignore );
+		return new EntityHierarchyBuilder( processingContext ).process(
+				collectRootEntityTypes( processingContext.getSourceModel().getClassDetailsRegistry() ),
+				EntityHierarchyBuilder::ignore
+		);
 	}
 
 	private static void ignore(IdentifiableTypeMetadata it) {}

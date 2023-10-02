@@ -34,6 +34,9 @@ public class AnnotationUsageImpl<A extends Annotation> implements AnnotationUsag
 			AnnotationDescriptor<A> annotationDescriptor,
 			AnnotationTarget annotationTarget,
 			SourceModelBuildingContext processingContext) {
+		assert annotationInstance != null : "Jandex AnnotationInstance was null";
+		assert annotationDescriptor != null : "AnnotationDescriptor was null - " + annotationInstance;
+
 		this.annotationTarget = annotationTarget;
 		this.annotationDescriptor = annotationDescriptor;
 

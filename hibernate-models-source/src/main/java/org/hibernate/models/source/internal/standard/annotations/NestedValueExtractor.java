@@ -23,6 +23,7 @@ public class NestedValueExtractor<A extends Annotation> implements ValueExtracto
 	private final AnnotationDescriptor<A> descriptor;
 
 	public NestedValueExtractor(AnnotationDescriptor<A> descriptor) {
+		assert descriptor != null : "AnnotationDescriptor was null";
 		this.descriptor = descriptor;
 	}
 

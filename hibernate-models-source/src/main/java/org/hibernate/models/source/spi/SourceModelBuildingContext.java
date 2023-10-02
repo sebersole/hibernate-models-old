@@ -6,7 +6,6 @@
  */
 package org.hibernate.models.source.spi;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.models.spi.ClassLoading;
 
 import org.jboss.jandex.IndexView;
@@ -46,18 +45,6 @@ public interface SourceModelBuildingContext extends NamedAnnotationScope {
 	 * Access to the pre-built Jandex index}, if any.
 	 */
 	IndexView getJandexView();
-
-	/**
-	 * Retrieve the Hibernate Commons Annotations {@link ReflectionManager}.
-	 *
-	 * @apiNote Supported for internal use only. This method will go away as
-	 *          we migrate away from Hibernate Commons Annotations to Jandex for
-	 *          annotation handling and XMl to annotation merging.
-	 *
-	 * @deprecated Use {@linkplain #getJandexView() Jandex} instead of HCANN
-	 */
-	@Deprecated
-	ReflectionManager getReflectionManager();
 
 	@Override
 	default SourceModelBuildingContext getSourceModelBuildingContext() {

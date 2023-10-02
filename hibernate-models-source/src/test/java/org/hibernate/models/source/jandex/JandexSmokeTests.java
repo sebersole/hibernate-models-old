@@ -56,7 +56,6 @@ public class JandexSmokeTests {
 		final SourceModelBuildingContextImpl buildingContext = new SourceModelBuildingContextImpl(
 				SimpleClassLoading.SIMPLE_CLASS_LOADING,
 				jandexIndex,
-				null,
 				(contributions, buildingContext1) -> {
 				}
 		);

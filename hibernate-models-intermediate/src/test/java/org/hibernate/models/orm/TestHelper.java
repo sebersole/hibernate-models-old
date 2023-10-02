@@ -9,9 +9,6 @@ package org.hibernate.models.orm;
 import java.io.IOException;
 import java.util.Set;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.models.orm.internal.EntityHierarchyBuilder;
 import org.hibernate.models.orm.internal.OrmModelBuildingContextImpl;
 import org.hibernate.models.orm.internal.SourceModelImpl;
@@ -37,11 +34,33 @@ import static org.hibernate.models.orm.internal.AnnotationHelper.forEachOrmAnnot
  * @author Steve Ebersole
  */
 public class TestHelper {
-	public static SourceModelBuildingContext createBuildingContext(Class<?>... domainClasses) {
-		return createBuildingContext( SIMPLE_CLASS_LOADING, domainClasses );
+	public static OrmModelBuildingContextImpl createBuildingContext(Class<?>... domainClasses) {
+		final SourceModelBuildingContext sourceBuildingContext = createSourceBuildingContext( domainClasses );
+		final IndexView jandexIndex = sourceBuildingContext.getJandexView();
+
+		for ( int i = 0; i < domainClasses.length; i++ ) {
+			final ClassInfo classInfo = jandexIndex.getClassByName( domainClasses[i] );
+			if ( classInfo == null ) {
+				throw new UnknownClassException( domainClasses[i].getName() );
+			}
+			new ClassDetailsImpl( classInfo, sourceBuildingContext );
+		}
+
+		return new OrmModelBuildingContextImpl(
+				new SourceModelImpl(
+						sourceBuildingContext.getAnnotationDescriptorRegistry(),
+						sourceBuildingContext.getClassDetailsRegistry()
+				),
+				SIMPLE_CLASS_LOADING,
+				jandexIndex
+		);
 	}
 
-	public static SourceModelBuildingContext createBuildingContext(ClassLoading classLoading, Class<?>... domainClasses) {
+	public static SourceModelBuildingContext createSourceBuildingContext(Class<?>... domainClasses) {
+		return createSourceBuildingContext( SIMPLE_CLASS_LOADING, domainClasses );
+	}
+
+	public static SourceModelBuildingContext createSourceBuildingContext(ClassLoading classLoading, Class<?>... domainClasses) {
 		final Indexer indexer = new Indexer();
 		JandexIndexerHelper.applyBaseline( indexer, SIMPLE_CLASS_LOADING );
 		for ( Class<?> modelClass : domainClasses ) {
@@ -56,7 +75,6 @@ public class TestHelper {
 		return new SourceModelBuildingContextImpl(
 				classLoading,
 				indexer.complete(),
-				null,
 				(contributions, buildingContext) -> {
 					forEachOrmAnnotation( contributions::registerAnnotation );
 					final ClassDetailsRegistry classDetailsRegistry = buildingContext.getClassDetailsRegistry();
@@ -72,7 +90,7 @@ public class TestHelper {
 
 	public static Set<EntityHierarchy> buildHierarchies(Class<?>... classes) {
 		return buildHierarchies(
-				createBuildingContext( classes ),
+				createSourceBuildingContext( classes ),
 				classes
 		);
 	}
@@ -80,10 +98,10 @@ public class TestHelper {
 	public static Set<EntityHierarchy> buildHierarchies(
 			SourceModelBuildingContext sourceModelBuildingContext,
 			Class<?>... classes) {
-		final IndexView jandexView = sourceModelBuildingContext.getJandexView();
+		final IndexView jandexIndex = sourceModelBuildingContext.getJandexView();
 
 		for ( int i = 0; i < classes.length; i++ ) {
-			final ClassInfo classInfo = jandexView.getClassByName( classes[i] );
+			final ClassInfo classInfo = jandexIndex.getClassByName( classes[i] );
 			if ( classInfo == null ) {
 				throw new UnknownClassException( classes[i].getName() );
 			}
@@ -94,7 +112,9 @@ public class TestHelper {
 				new SourceModelImpl(
 						sourceModelBuildingContext.getAnnotationDescriptorRegistry(),
 						sourceModelBuildingContext.getClassDetailsRegistry()
-				)
+				),
+				SIMPLE_CLASS_LOADING,
+				jandexIndex
 		);
 		return EntityHierarchyBuilder.createEntityHierarchies( ormModelBuildingContext );
 	}

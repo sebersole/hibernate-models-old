@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.ByteValueExtractor.BYTE_EXTRACTOR;
@@ -23,7 +25,7 @@ public class ByteValueDescriptor extends AbstractCommonValueDescriptor<Byte> {
 	}
 
 	@Override
-	protected ValueExtractor<Byte> getValueExtractor() {
+	protected ValueExtractor<Byte> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return BYTE_EXTRACTOR;
 	}
 }

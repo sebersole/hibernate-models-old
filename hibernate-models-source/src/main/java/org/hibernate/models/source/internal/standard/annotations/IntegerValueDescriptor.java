@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.IntegerValueExtractor.INTEGER_EXTRACTOR;
@@ -23,7 +25,7 @@ public class IntegerValueDescriptor extends AbstractCommonValueDescriptor<Intege
 	}
 
 	@Override
-	protected ValueExtractor<Integer> getValueExtractor() {
+	protected ValueExtractor<Integer> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return INTEGER_EXTRACTOR;
 	}
 }

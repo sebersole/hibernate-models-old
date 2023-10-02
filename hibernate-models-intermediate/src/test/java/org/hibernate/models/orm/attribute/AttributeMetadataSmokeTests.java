@@ -61,7 +61,7 @@ import jakarta.persistence.Version;
 import static jakarta.persistence.AccessType.PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.models.orm.TestHelper.buildHierarchies;
-import static org.hibernate.models.orm.TestHelper.createBuildingContext;
+import static org.hibernate.models.orm.TestHelper.createSourceBuildingContext;
 import static org.hibernate.models.orm.spi.AttributeMetadata.AttributeNature.ANY;
 import static org.hibernate.models.orm.spi.AttributeMetadata.AttributeNature.BASIC;
 import static org.hibernate.models.orm.spi.AttributeMetadata.AttributeNature.EMBEDDED;
@@ -127,7 +127,7 @@ public class AttributeMetadataSmokeTests {
 
 	@Test
 	void testClassifications() {
-		final SourceModelBuildingContext buildingContext = createBuildingContext(
+		final SourceModelBuildingContext buildingContext = TestHelper.createSourceBuildingContext(
 				Container.class,
 				org.hibernate.type.descriptor.java.AbstractClassJavaType.class,
 				StringJavaType.class,
@@ -194,7 +194,7 @@ public class AttributeMetadataSmokeTests {
 
 	@Test
 	void testCollectionsAsBasic() {
-		final SourceModelBuildingContext buildingContext = createBuildingContext(
+		final SourceModelBuildingContext buildingContext = TestHelper.createSourceBuildingContext(
 				CollectionsAsBasicEntity.class,
 				ListConverter.class
 		);

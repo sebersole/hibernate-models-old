@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.FloatValueExtractor.FLOAT_EXTRACTOR;
@@ -23,7 +25,7 @@ public class FloatValueDescriptor extends AbstractCommonValueDescriptor<Float> {
 	}
 
 	@Override
-	protected ValueExtractor<Float> getValueExtractor() {
+	protected ValueExtractor<Float> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return FLOAT_EXTRACTOR;
 	}
 }

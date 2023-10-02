@@ -7,7 +7,6 @@ dependencies {
     implementation libs.logging
 
     implementation libs.jandex
-    implementation libs.hcann
 
     implementation libs.jaxbApi
     implementation libs.jaxb

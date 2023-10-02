@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.PassthruValueExtractor.PASSTHRU_EXTRACTOR;
@@ -23,7 +25,7 @@ public class PassthruValueDescriptor<V> extends AbstractCommonValueDescriptor<V>
 	}
 
 	@Override
-	protected ValueExtractor<V> getValueExtractor() {
+	protected ValueExtractor<V> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		//noinspection unchecked
 		return (ValueExtractor<V>) PASSTHRU_EXTRACTOR;
 	}

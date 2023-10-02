@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.LongValueExtractor.LONG_EXTRACTOR;
@@ -23,7 +25,7 @@ public class LongValueDescriptor extends AbstractCommonValueDescriptor<Long> {
 	}
 
 	@Override
-	protected ValueExtractor<Long> getValueExtractor() {
+	protected ValueExtractor<Long> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return LONG_EXTRACTOR;
 	}
 }

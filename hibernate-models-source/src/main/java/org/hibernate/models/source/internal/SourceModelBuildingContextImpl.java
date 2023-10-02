@@ -31,7 +31,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.function.Consumer;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.models.internal.CollectionHelper;
 import org.hibernate.models.source.ModelsException;
 import org.hibernate.models.source.UnknownClassException;
@@ -59,7 +58,6 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 	private final ClassLoading classLoadingAccess;
 
 	private final IndexView jandexIndex;
-	private final ReflectionManager reflectionManager;
 
 	private final ClassmateContext classmateContext;
 
@@ -68,21 +66,16 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 
 	private final Map<AnnotationDescriptor<?>,List<AnnotationUsage<?>>> annotationUsageMap = new HashMap<>();
 
-	public SourceModelBuildingContextImpl(
-			ClassLoading classLoadingAccess,
-			IndexView jandexIndex,
-			ReflectionManager reflectionManager) {
-		this( classLoadingAccess, jandexIndex, reflectionManager, null );
+	public SourceModelBuildingContextImpl(ClassLoading classLoadingAccess, IndexView jandexIndex) {
+		this( classLoadingAccess, jandexIndex, null );
 	}
 
 	public SourceModelBuildingContextImpl(
 			ClassLoading classLoadingAccess,
 			IndexView jandexIndex,
-			ReflectionManager reflectionManager,
 			RegistryPrimer registryPrimer) {
 		this.classLoadingAccess = classLoadingAccess;
 		this.jandexIndex = jandexIndex;
-		this.reflectionManager = reflectionManager;
 		this.classmateContext = new ClassmateContext();
 
 		this.descriptorRegistry = new AnnotationDescriptorRegistryImpl( this );
@@ -164,11 +157,6 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 	@Override
 	public IndexView getJandexView() {
 		return jandexIndex;
-	}
-
-	@Override
-	public ReflectionManager getReflectionManager() {
-		return reflectionManager;
 	}
 
 	@Override

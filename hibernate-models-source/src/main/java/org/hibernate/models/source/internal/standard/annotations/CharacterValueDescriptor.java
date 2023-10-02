@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.CharacterValueExtractor.CHARACTER_EXTRACTOR;
@@ -23,7 +25,7 @@ public class CharacterValueDescriptor extends AbstractCommonValueDescriptor<Char
 	}
 
 	@Override
-	protected ValueExtractor<Character> getValueExtractor() {
+	protected ValueExtractor<Character> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return CHARACTER_EXTRACTOR;
 	}
 }

@@ -94,7 +94,6 @@ public class TestHelper {
 		return new SourceModelBuildingContextImpl(
 				SIMPLE_CLASS_LOADING,
 				jandexIndex,
-				null,
 				(contributions, buildingContext1) -> {
 					contributions.registerAnnotation( COLUMN );
 					contributions.registerAnnotation( ENTITY );

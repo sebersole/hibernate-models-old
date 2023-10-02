@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.BooleanValueExtractor.BOOLEAN_EXTRACTOR;
@@ -23,7 +25,7 @@ public class BooleanValueDescriptor extends AbstractCommonValueDescriptor<Boolea
 	}
 
 	@Override
-	protected ValueExtractor<Boolean> getValueExtractor() {
+	protected ValueExtractor<Boolean> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return BOOLEAN_EXTRACTOR;
 	}
 }

@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 /**
@@ -24,7 +26,7 @@ public class EnumValueDescriptor<E extends Enum<E>> extends AbstractCommonValueD
 	}
 
 	@Override
-	protected ValueExtractor<E> getValueExtractor() {
+	protected ValueExtractor<E> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return extractor;
 	}
 }

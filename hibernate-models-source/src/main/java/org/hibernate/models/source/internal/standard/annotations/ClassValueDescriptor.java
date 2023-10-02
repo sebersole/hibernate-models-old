@@ -7,6 +7,7 @@
 package org.hibernate.models.source.internal.standard.annotations;
 
 import org.hibernate.models.source.spi.ClassDetails;
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationValue;
 
@@ -25,7 +26,7 @@ public class ClassValueDescriptor extends AbstractCommonValueDescriptor<ClassDet
 	}
 
 	@Override
-	protected ValueExtractor<ClassDetails> getValueExtractor() {
+	protected ValueExtractor<ClassDetails> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return CLASS_EXTRACTOR;
 	}
 }

@@ -20,7 +20,7 @@ public abstract class AbstractCommonValueDescriptor<W> extends AbstractValueDesc
 		super( name );
 	}
 
-	protected abstract ValueExtractor<W> getValueExtractor();
+	protected abstract ValueExtractor<W> getValueExtractor(SourceModelBuildingContext buildingContext);
 
 	@Override
 	protected final AnnotationAttributeValue<W> createImplicitWrapper(
@@ -29,7 +29,7 @@ public abstract class AbstractCommonValueDescriptor<W> extends AbstractValueDesc
 			SourceModelBuildingContext buildingContext) {
 		return new AttributeValueImpl<>(
 				this,
-				getValueExtractor().extractValue( implicitValue, buildingContext ),
+				getValueExtractor( buildingContext ).extractValue( implicitValue, buildingContext ),
 				true
 		);
 	}
@@ -41,7 +41,7 @@ public abstract class AbstractCommonValueDescriptor<W> extends AbstractValueDesc
 			SourceModelBuildingContext buildingContext) {
 		return new AttributeValueImpl<>(
 				this,
-				getValueExtractor().extractValue( explicitValue, buildingContext ),
+				getValueExtractor( buildingContext ).extractValue( explicitValue, buildingContext ),
 				false
 		);
 	}

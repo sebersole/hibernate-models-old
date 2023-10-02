@@ -6,8 +6,6 @@
  */
 package org.hibernate.models.source;
 
-import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.models.source.internal.standard.ClassDetailsBuilderImpl;
 import org.hibernate.models.source.internal.standard.ClassDetailsImpl;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
@@ -53,27 +51,6 @@ public class AnnotationUsageSemanticTests {
 		// shows the baseline for `AnnotationTarget#getRepeatedAnnotations`
 		assertThat( SomethingExtra.class.getAnnotationsByType( CustomAnnotation.class ) ).hasSize( 1 );
 		assertThat( SomethingExtra.class.getAnnotationsByType( CustomAnnotations.class ) ).hasSize( 1 );
-	}
-
-	@Test
-	void hcannAssertions() {
-		final JavaReflectionManager hcannReflectionManager = new JavaReflectionManager();
-		final XClass whateverClass = hcannReflectionManager.toXClass( Whatever.class );
-		final XClass somethingClass = hcannReflectionManager.toXClass( Something.class );
-		final XClass somethingExtraClass = hcannReflectionManager.toXClass( SomethingExtra.class );
-
-		// meta-annotations
-		assert !whateverClass.isAnnotationPresent( CustomMetaAnnotation.class );
-		assert !somethingClass.isAnnotationPresent( CustomMetaAnnotation.class );
-		assert !somethingExtraClass.isAnnotationPresent( CustomMetaAnnotation.class );
-
-		// inherited
-		assert whateverClass.isAnnotationPresent( CustomAnnotation.class );
-		assert !whateverClass.isAnnotationPresent( CustomAnnotations.class );
-		assert somethingClass.isAnnotationPresent( CustomAnnotation.class );
-		assert !somethingClass.isAnnotationPresent( CustomAnnotations.class );
-		assert somethingExtraClass.isAnnotationPresent( CustomAnnotation.class );
-		assert somethingExtraClass.isAnnotationPresent( CustomAnnotations.class );
 	}
 
 	@Test

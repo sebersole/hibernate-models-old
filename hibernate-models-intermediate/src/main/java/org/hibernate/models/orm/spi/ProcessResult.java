@@ -6,17 +6,11 @@
  */
 package org.hibernate.models.orm.spi;
 
-import org.hibernate.models.spi.ClassLoading;
-
-import org.jboss.jandex.IndexView;
+import java.util.Set;
 
 /**
  * @author Steve Ebersole
  */
-public interface OrmModelBuildingContext {
-	SourceModel getSourceModel();
-
-	ClassLoading getClassLoading();
-
-	IndexView getJandexIndex();
+public interface ProcessResult {
+ Set<EntityHierarchy> getEntityHierarchies();
 }

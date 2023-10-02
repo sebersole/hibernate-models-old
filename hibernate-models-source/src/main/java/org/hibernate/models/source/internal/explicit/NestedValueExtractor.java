@@ -64,6 +64,6 @@ public class NestedValueExtractor<A extends Annotation> implements ValueExtracto
 
 	@Override
 	public AnnotationAttributeDescriptor createAttributeDescriptor(String name) {
-		return new NestedValueDescriptor<>( name, annotationDescriptor );
+		return new NestedValueDescriptor<>( name, annotationType );
 	}
 }

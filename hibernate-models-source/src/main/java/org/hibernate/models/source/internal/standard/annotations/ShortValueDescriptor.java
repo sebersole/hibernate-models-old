@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.ShortValueExtractor.SHORT_EXTRACTOR;
@@ -23,7 +25,7 @@ public class ShortValueDescriptor extends AbstractCommonValueDescriptor<Short> {
 	}
 
 	@Override
-	protected ValueExtractor<Short> getValueExtractor() {
+	protected ValueExtractor<Short> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return SHORT_EXTRACTOR;
 	}
 }

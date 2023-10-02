@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.DoubleValueExtractor.DOUBLE_EXTRACTOR;
@@ -23,7 +25,7 @@ public class DoubleValueDescriptor extends AbstractCommonValueDescriptor<Double>
 	}
 
 	@Override
-	protected ValueExtractor<Double> getValueExtractor() {
+	protected ValueExtractor<Double> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return DOUBLE_EXTRACTOR;
 	}
 }

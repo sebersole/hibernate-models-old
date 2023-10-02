@@ -6,6 +6,8 @@
  */
 package org.hibernate.models.source.internal.standard.annotations;
 
+import org.hibernate.models.source.spi.SourceModelBuildingContext;
+
 import org.jboss.jandex.AnnotationValue;
 
 import static org.hibernate.models.source.internal.standard.annotations.StringValueExtractor.STRING_EXTRACTOR;
@@ -23,7 +25,7 @@ public class StringValueDescriptor extends AbstractCommonValueDescriptor<String>
 	}
 
 	@Override
-	protected ValueExtractor<String> getValueExtractor() {
+	protected ValueExtractor<String> getValueExtractor(SourceModelBuildingContext buildingContext) {
 		return STRING_EXTRACTOR;
 	}
 }
