@@ -14,6 +14,7 @@ import org.hibernate.binder.AttributeBinder;
 import org.hibernate.binder.TypeBinder;
 import org.hibernate.binder.internal.AttributeAccessorBinder;
 import org.hibernate.binder.internal.CommentBinder;
+import org.hibernate.binder.internal.CommentsBinder;
 import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.model.relational.ExportableProducer;
 import org.hibernate.generator.BeforeExecutionGenerator;
@@ -50,55 +51,6 @@ import jakarta.persistence.FetchType;
  */
 @SuppressWarnings("unused")
 public class OrmAnnotationIndexer {
-	public static final Class<?>[] SUPPORT_CLASSES = new Class[] {
-			AttributeBinder.class,
-			AttributeAccessorBinder.class,
-			BasicJavaType.class,
-			BeforeExecutionGenerator.class,
-			CacheConcurrencyStrategy.class,
-			CacheModeType.class,
-			CascadeType.class,
-			CollectionClassification.class,
-			CommentBinder.class,
-			CompositeUserType.class,
-			Configurable.class,
-			CurrentTimestampGeneration.class,
-			DialectOverride.class,
-			org.hibernate.metamodel.spi.EmbeddableInstantiator.class,
-			EventType.class,
-			ExportableProducer.class,
-			FetchMode.class,
-			FetchType.class,
-			FlushModeType.class,
-			GeneratedAlwaysGeneration.class,
-			GeneratedGeneration.class,
-			GenerationTime.class,
-			Generator.class,
-			IdentifierGenerator.class,
-			org.hibernate.metamodel.spi.Instantiator.class,
-			org.hibernate.type.descriptor.java.JavaType.class,
-			org.hibernate.type.descriptor.jdbc.JdbcType.class,
-			LazyCollectionOption.class,
-			LazyToOneOption.class,
-			MutabilityPlan.class,
-			NotFoundAction.class,
-			OnDeleteAction.class,
-			OnExecutionGenerator.class,
-			OptimisticLockType.class,
-			PolymorphismType.class,
-			PropertyAccessStrategy.class,
-			ResultCheckStyle.class,
-			SourceGeneration.class,
-			SourceType.class,
-			TenantIdBinder.class,
-			TenantIdGeneration.class,
-			TimeZoneStorageType.class,
-			TypeBinder.class,
-			UserCollectionType.class,
-			UserType.class,
-			org.hibernate.id.uuid.UuidGenerator.class,
-			VmValueGeneration.class
-	};
 
 	public static final Class<?>[] ANNOTATION_CLASSES = new Class[] {
 			Any.class,
@@ -271,6 +223,57 @@ public class OrmAnnotationIndexer {
 			DialectOverride.FilterDefOverrides.class,
 			DialectOverride.Version.class,
 			DialectOverride.OverridesAnnotation.class
+	};
+
+	public static final Class<?>[] SUPPORT_CLASSES = new Class[] {
+			AttributeBinder.class,
+			AttributeAccessorBinder.class,
+			BasicJavaType.class,
+			BeforeExecutionGenerator.class,
+			CacheConcurrencyStrategy.class,
+			CacheModeType.class,
+			CascadeType.class,
+			CollectionClassification.class,
+			CommentBinder.class,
+			CommentsBinder.class,
+			CompositeUserType.class,
+			Configurable.class,
+			CurrentTimestampGeneration.class,
+			DialectOverride.class,
+			org.hibernate.metamodel.spi.EmbeddableInstantiator.class,
+			EventType.class,
+			ExportableProducer.class,
+			FetchMode.class,
+			FetchType.class,
+			FlushModeType.class,
+			GeneratedAlwaysGeneration.class,
+			GeneratedGeneration.class,
+			GenerationTime.class,
+			Generator.class,
+			IdentifierGenerator.class,
+			org.hibernate.metamodel.spi.Instantiator.class,
+			org.hibernate.type.descriptor.java.JavaType.class,
+			org.hibernate.type.descriptor.jdbc.JdbcType.class,
+			LazyCollectionOption.class,
+			LazyToOneOption.class,
+			MutabilityPlan.class,
+			NotFoundAction.class,
+			OnDeleteAction.class,
+			OnExecutionGenerator.class,
+			OptimisticLockType.class,
+			PolymorphismType.class,
+			PropertyAccessStrategy.class,
+			ResultCheckStyle.class,
+			SourceGeneration.class,
+			SourceType.class,
+			TenantIdBinder.class,
+			TenantIdGeneration.class,
+			TimeZoneStorageType.class,
+			TypeBinder.class,
+			UserCollectionType.class,
+			UserType.class,
+			org.hibernate.id.uuid.UuidGenerator.class,
+			VmValueGeneration.class
 	};
 
 	public static void apply(Indexer indexer) {

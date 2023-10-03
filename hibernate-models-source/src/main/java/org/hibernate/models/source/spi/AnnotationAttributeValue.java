@@ -34,6 +34,10 @@ public interface AnnotationAttributeValue<W> {
 		return getValue( Boolean.class );
 	}
 
+	default ClassDetails asClass() {
+		return getValue( ClassDetails.class );
+	}
+
 	/**
 	 * Whether the value is implicit (the default), or was explicitly specified
 	 *

@@ -36,7 +36,7 @@ import static org.hibernate.models.orm.internal.AnnotationHelper.forEachOrmAnnot
 public class TestHelper {
 	public static OrmModelBuildingContextImpl createBuildingContext(Class<?>... domainClasses) {
 		final SourceModelBuildingContext sourceBuildingContext = createSourceBuildingContext( domainClasses );
-		final IndexView jandexIndex = sourceBuildingContext.getJandexView();
+		final IndexView jandexIndex = sourceBuildingContext.getJandexIndex();
 
 		for ( int i = 0; i < domainClasses.length; i++ ) {
 			final ClassInfo classInfo = jandexIndex.getClassByName( domainClasses[i] );
@@ -98,7 +98,7 @@ public class TestHelper {
 	public static Set<EntityHierarchy> buildHierarchies(
 			SourceModelBuildingContext sourceModelBuildingContext,
 			Class<?>... classes) {
-		final IndexView jandexIndex = sourceModelBuildingContext.getJandexView();
+		final IndexView jandexIndex = sourceModelBuildingContext.getJandexIndex();
 
 		for ( int i = 0; i < classes.length; i++ ) {
 			final ClassInfo classInfo = jandexIndex.getClassByName( classes[i] );

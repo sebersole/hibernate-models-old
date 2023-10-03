@@ -19,4 +19,6 @@ public interface OrmModelBuildingContext {
 	ClassLoading getClassLoading();
 
 	IndexView getJandexIndex();
+
+	ClassmateContext getClassmateContext();
 }

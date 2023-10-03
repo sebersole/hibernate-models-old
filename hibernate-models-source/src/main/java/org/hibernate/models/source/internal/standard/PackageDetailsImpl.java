@@ -13,7 +13,7 @@ import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
 
 /**
- * Details about a "managed package".
+ * Details about a package, presumably with annotations on its {@linkplain package-inf.class}.
  *
  * @author Steve Ebersole
  */
@@ -22,8 +22,8 @@ public class PackageDetailsImpl extends AbstractAnnotationTarget implements Pack
 
 	public PackageDetailsImpl(
 			ClassInfo packageInfoClassInfo,
-			SourceModelBuildingContext processingContext) {
-		super( processingContext );
+			SourceModelBuildingContext buildingContext) {
+		super( buildingContext );
 		this.packageInfoClassInfo = packageInfoClassInfo;
 	}
 
@@ -34,6 +34,6 @@ public class PackageDetailsImpl extends AbstractAnnotationTarget implements Pack
 
 	@Override
 	public String getName() {
-		return packageInfoClassInfo.simpleName();
+		return packageInfoClassInfo.name().packagePrefix();
 	}
 }

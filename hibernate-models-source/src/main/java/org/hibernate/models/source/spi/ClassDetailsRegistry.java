@@ -7,9 +7,8 @@
 package org.hibernate.models.source.spi;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+import org.hibernate.models.source.ModelsException;
 import org.hibernate.models.source.UnknownClassException;
 
 /**
@@ -32,9 +31,9 @@ public interface ClassDetailsRegistry {
 	ClassDetails getClassDetails(String name);
 
 	/**
-	 * Visit each registered managed-class
+	 * Visit each registered class details
 	 */
-	void forEachClassDetails(Consumer<ClassDetails> consumer);
+	void forEachClassDetails(ClassDetailsConsumer consumer);
 
 	/**
 	 * Get the list of all direct subtypes for the named managed-class.  Returns
@@ -45,7 +44,7 @@ public interface ClassDetailsRegistry {
 	/**
 	 * Visit each direct subtype of the named managed-class
 	 */
-	void forEachDirectSubType(String superTypeName, Consumer<ClassDetails> consumer);
+	void forEachDirectSubType(String superTypeName, ClassDetailsConsumer consumer);
 
 	/**
 	 * Adds a managed-class descriptor using its {@linkplain ClassDetails#getName() name}
@@ -71,8 +70,54 @@ public interface ClassDetailsRegistry {
 	ClassDetails resolveClassDetails(String name, ClassDetailsBuilder creator);
 
 	/**
-	 * Resolves a managed-class by name.  If there is currently no such registration,
-	 * one is created using the specified {@code creator}.
+	 * Resolve (find or create) ClassDetails by name.  If there is currently no
+	 * such registration, one is created using the specified {@code creator}.
 	 */
-	ClassDetails resolveClassDetails(String name, Supplier<ClassDetails> creator);
+	ClassDetails resolveClassDetails(String name, ClassDetailsCreator creator);
+
+	/**
+	 * Resolve (find or create) the named PackageDetails.  If there is currently no
+	 * such registration, one is created using the specified {@code creator}.
+	 */
+	PackageDetails resolvePackageDetails(String packageName, PackageDetailsCreator creator);
+
+	/**
+	 * Find the named PackageDetails, or return {@code null}
+	 *
+	 * @return The PackageDetails, or null
+	 */
+	PackageDetails findPackageDetails(String name);
+
+	/**
+	 * Get the named PackageDetails, or throw an exception
+	 *
+	 * @return The PackageDetails, never null.
+	 * @throws ModelsException if named PackageDetails not found
+	 */
+	PackageDetails getPackageDetails(String name);
+
+	/**
+	 * Visit each registered package details
+	 */
+	void forEachPackageDetails(PackageDetailsConsumer consumer);
+
+	@FunctionalInterface
+	interface PackageDetailsConsumer {
+		void consume(PackageDetails packageDetails);
+	}
+
+	@FunctionalInterface
+	interface ClassDetailsCreator {
+		ClassDetails createClassDetails();
+	}
+
+	@FunctionalInterface
+	interface ClassDetailsConsumer {
+		void consume(ClassDetails classDetails);
+	}
+
+	@FunctionalInterface
+	interface PackageDetailsCreator {
+		PackageDetails createPackageDetails();
+	}
 }

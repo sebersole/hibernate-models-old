@@ -6,13 +6,23 @@
  */
 package org.hibernate.models.orm.process;
 
-import org.hibernate.models.orm.internal.OrmModelBuildingContextImpl;
+import java.io.IOException;
+
+import org.hibernate.annotations.JavaTypeRegistration;
+import org.hibernate.boot.model.jandex.JandexIndexer;
+import org.hibernate.models.orm.process.internal.ManagedResourcesImpl;
+import org.hibernate.models.orm.process.spi.ManagedResources;
+import org.hibernate.models.orm.process.spi.ProcessResult;
+import org.hibernate.models.orm.process.spi.Processor;
 import org.hibernate.models.orm.spi.EntityHierarchy;
 import org.hibernate.models.orm.spi.EntityTypeMetadata;
-import org.hibernate.models.orm.spi.ProcessResult;
-import org.hibernate.models.orm.spi.Processor;
+import org.hibernate.models.source.internal.SourceModelBuildingContextImpl;
+import org.hibernate.models.source.internal.jandex.JandexIndexerHelper;
+import org.hibernate.type.descriptor.java.StringJavaType;
 
 import org.junit.jupiter.api.Test;
+
+import org.jboss.jandex.Indexer;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
@@ -24,7 +34,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.models.orm.TestHelper.createBuildingContext;
+import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
 
 /**
  * @author Steve Ebersole
@@ -32,15 +42,37 @@ import static org.hibernate.models.orm.TestHelper.createBuildingContext;
 public class ProcessorTests {
 	@Test
 	void testSimple() {
-		final OrmModelBuildingContextImpl buildingContext = createBuildingContext( Person.class );
-		final ProcessResult result = Processor.process( buildingContext );
-		assertThat( result.getEntityHierarchies() ).hasSize( 1 );
-		final EntityHierarchy hierarchy = result.getEntityHierarchies().iterator().next();
+		final ManagedResourcesImpl.Builder managedResourcesBuilder = new ManagedResourcesImpl.Builder();
+		managedResourcesBuilder.addLoadedClasses( Person.class );
+		final ManagedResources managedResources = managedResourcesBuilder.build();
+
+		final Indexer indexer = new Indexer();
+		JandexIndexerHelper.applyBaseline( indexer, SIMPLE_CLASS_LOADING );
+		JandexIndexer.index( managedResources, indexer, SIMPLE_CLASS_LOADING );
+
+		// the test also needs these indexed
+		try {
+			indexer.indexClass( org.hibernate.type.descriptor.java.StringJavaType.class );
+			indexer.indexClass( org.hibernate.type.descriptor.java.AbstractClassJavaType.class );
+		}
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
+
+		final SourceModelBuildingContextImpl buildingContext = new SourceModelBuildingContextImpl(
+				SIMPLE_CLASS_LOADING,
+				indexer.complete()
+		);
+
+		final ProcessResult processResult = Processor.process( managedResources, false, buildingContext );
+		assertThat( processResult.getEntityHierarchies() ).hasSize( 1 );
+		final EntityHierarchy hierarchy = processResult.getEntityHierarchies().iterator().next();
 		assertThat( hierarchy.getInheritanceType() ).isEqualTo( InheritanceType.SINGLE_TABLE );
 		assertThat( hierarchy.getCaching() ).isNotNull();
 		assertThat( hierarchy.getCaching().isEnabled() ).isFalse();
 		assertThat( hierarchy.getNaturalIdCaching() ).isNotNull();
 		assertThat( hierarchy.getNaturalIdCaching().isEnabled() ).isFalse();
+
 		assertThat( hierarchy.getRoot() ).isNotNull();
 		assertThat( hierarchy.getRoot().getSuperType() ).isNull();
 		assertThat( hierarchy.getRoot().hasSubTypes() ).isFalse();
@@ -49,14 +81,31 @@ public class ProcessorTests {
 		assertThat( hierarchy.getRoot().getAccessType() ).isEqualTo( AccessType.FIELD );
 		assertThat( hierarchy.getRoot().getAttributes() ).hasSize( 2 );
 
+		assertThat( processResult.getJavaTypeRegistrations() ).hasSize( 1 );
+		assertThat( processResult.getJavaTypeRegistrations().get( 0 ).getDomainType() ).isNotNull();
+		assertThat( processResult.getJavaTypeRegistrations().get( 0 ).getDomainType().getClassName() ).isEqualTo( String.class.getName() );
+		assertThat( processResult.getJavaTypeRegistrations().get( 0 ).getDescriptor() ).isNotNull();
+		assertThat( processResult.getJavaTypeRegistrations().get( 0 ).getDescriptor().getClassName() ).endsWith( "StringJavaType" );
 	}
 
 	@Test
 	void testJoined() {
-		final OrmModelBuildingContextImpl buildingContext = createBuildingContext( Root.class, Sub.class );
-		final ProcessResult result = Processor.process( buildingContext );
-		assertThat( result.getEntityHierarchies() ).hasSize( 1 );
-		final EntityHierarchy hierarchy = result.getEntityHierarchies().iterator().next();
+		final ManagedResourcesImpl.Builder managedResourcesBuilder = new ManagedResourcesImpl.Builder();
+		managedResourcesBuilder.addLoadedClasses( Root.class, Sub.class );
+		final ManagedResources managedResources = managedResourcesBuilder.build();
+
+		final Indexer indexer = new Indexer();
+		JandexIndexerHelper.applyBaseline( indexer, SIMPLE_CLASS_LOADING );
+		JandexIndexer.index( managedResources, indexer, SIMPLE_CLASS_LOADING );
+
+		final SourceModelBuildingContextImpl buildingContext = new SourceModelBuildingContextImpl(
+				SIMPLE_CLASS_LOADING,
+				indexer.complete()
+		);
+
+		final ProcessResult processResult = Processor.process( managedResources, false, buildingContext );
+		assertThat( processResult.getEntityHierarchies() ).hasSize( 1 );
+		final EntityHierarchy hierarchy = processResult.getEntityHierarchies().iterator().next();
 		assertThat( hierarchy.getInheritanceType() ).isEqualTo( InheritanceType.JOINED );
 		assertThat( hierarchy.getCaching() ).isNotNull();
 		assertThat( hierarchy.getCaching().isEnabled() ).isFalse();
@@ -83,6 +132,7 @@ public class ProcessorTests {
 
 	@Entity(name="Person")
 	@Table(name="persons")
+	@JavaTypeRegistration(javaType = String.class, descriptorClass = StringJavaType.class)
 	public static class Person {
 		@Id
 		private Integer id;

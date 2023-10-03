@@ -28,7 +28,6 @@ import org.hibernate.models.source.spi.AnnotationUsage;
 import org.hibernate.models.source.spi.SourceModelBuildingContext;
 
 import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.DotName;
 
 /**

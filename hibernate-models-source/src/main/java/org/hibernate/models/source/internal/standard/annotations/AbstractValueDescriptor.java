@@ -42,7 +42,7 @@ public abstract class AbstractValueDescriptor<W> implements AnnotationAttributeD
 		if ( explicitValue == null ) {
 			// this attribute was not specified, use the default
 			final AnnotationValue implicitValue = annotationInstance.valueWithDefault(
-					buildingContext.getJandexView(),
+					buildingContext.getJandexIndex(),
 					attributeDescriptor.getAttributeName()
 			);
 			return createImplicitWrapper( implicitValue, target, buildingContext );

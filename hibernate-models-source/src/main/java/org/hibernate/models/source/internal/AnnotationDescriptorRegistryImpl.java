@@ -31,7 +31,7 @@ public class AnnotationDescriptorRegistryImpl implements AnnotationDescriptorReg
 		this.context = context;
 	}
 
-	void register(AnnotationDescriptor<?> descriptor) {
+	public void register(AnnotationDescriptor<?> descriptor) {
 		descriptorMap.put( descriptor.getAnnotationType(), descriptor );
 		if ( descriptor.getRepeatableContainer() != null ) {
 			// the descriptor is repeatable - register it under its container
@@ -41,14 +41,20 @@ public class AnnotationDescriptorRegistryImpl implements AnnotationDescriptorReg
 
 	@Override
 	public <A extends Annotation> AnnotationDescriptor<A> getDescriptor(Class<A> javaType) {
+		return resolveDescriptor( javaType, this::buildAdHocAnnotationDescriptor );
+	}
+
+	@Override
+	public <A extends Annotation> AnnotationDescriptor<A> resolveDescriptor(
+			Class<A> javaType,
+			DescriptorCreator<A> creator) {
 		//noinspection unchecked
 		final AnnotationDescriptor<A> existing = (AnnotationDescriptor<A>) descriptorMap.get( javaType );
 		if ( existing != null ) {
 			return existing;
 		}
 
-		// indicates a non-JPA and non-Hibernate annotation.  we need to track these for meta-annotation handling later.
-		final AnnotationDescriptor<A> created = buildAdHocAnnotationDescriptor( javaType );
+		final AnnotationDescriptor<A> created = creator.createDescriptor( javaType );
 		descriptorMap.put( javaType, created );
 		return created;
 	}

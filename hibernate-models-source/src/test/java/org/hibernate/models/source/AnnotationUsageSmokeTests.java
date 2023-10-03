@@ -43,7 +43,7 @@ public class AnnotationUsageSmokeTests {
 				CustomMetaAnnotation.class
 		);
 
-		final ClassInfo classInfo = buildingContext.getJandexView().getClassByName( SimpleEntity.class );
+		final ClassInfo classInfo = buildingContext.getJandexIndex().getClassByName( SimpleEntity.class );
 		final FieldInfo nameField = classInfo.field( "name" );
 		final AnnotationInstance nameColumnAnn = nameField.annotation( DotName.createSimple( Column.class ) );
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.models.orm.internal;
 
+import org.hibernate.models.orm.spi.ClassmateContext;
 import org.hibernate.models.orm.spi.OrmModelBuildingContext;
 import org.hibernate.models.orm.spi.SourceModel;
 import org.hibernate.models.spi.ClassLoading;
@@ -19,11 +20,13 @@ public class OrmModelBuildingContextImpl implements OrmModelBuildingContext {
 	private final SourceModel sourceModel;
 	private final ClassLoading classLoading;
 	private final IndexView jandexIndex;
+	private final ClassmateContext classmateContext;
 
 	public OrmModelBuildingContextImpl(SourceModel sourceModel, ClassLoading classLoading, IndexView jandexIndex) {
 		this.sourceModel = sourceModel;
 		this.classLoading = classLoading;
 		this.jandexIndex = jandexIndex;
+		this.classmateContext = new ClassmateContext();
 	}
 
 	@Override
@@ -39,5 +42,10 @@ public class OrmModelBuildingContextImpl implements OrmModelBuildingContext {
 	@Override
 	public IndexView getJandexIndex() {
 		return jandexIndex;
+	}
+
+	@Override
+	public ClassmateContext getClassmateContext() {
+		return classmateContext;
 	}
 }

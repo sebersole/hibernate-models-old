@@ -41,7 +41,6 @@ import org.hibernate.models.source.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.source.spi.AnnotationUsage;
 import org.hibernate.models.source.spi.ClassDetails;
 import org.hibernate.models.source.spi.ClassDetailsRegistry;
-import org.hibernate.models.source.spi.ClassmateContext;
 import org.hibernate.models.source.spi.RegistryPrimer;
 import org.hibernate.models.source.spi.SourceModelBuildingContext;
 import org.hibernate.models.spi.ClassLoading;
@@ -59,8 +58,6 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 
 	private final IndexView jandexIndex;
 
-	private final ClassmateContext classmateContext;
-
 	private final AnnotationDescriptorRegistryImpl descriptorRegistry;
 	private final ClassDetailsRegistry classDetailsRegistry;
 
@@ -76,7 +73,6 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 			RegistryPrimer registryPrimer) {
 		this.classLoadingAccess = classLoadingAccess;
 		this.jandexIndex = jandexIndex;
-		this.classmateContext = new ClassmateContext();
 
 		this.descriptorRegistry = new AnnotationDescriptorRegistryImpl( this );
 		this.classDetailsRegistry = new ClassDetailsRegistryImpl( this );
@@ -150,12 +146,7 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 	}
 
 	@Override
-	public ClassmateContext getClassmateContext() {
-		return classmateContext;
-	}
-
-	@Override
-	public IndexView getJandexView() {
+	public IndexView getJandexIndex() {
 		return jandexIndex;
 	}
 

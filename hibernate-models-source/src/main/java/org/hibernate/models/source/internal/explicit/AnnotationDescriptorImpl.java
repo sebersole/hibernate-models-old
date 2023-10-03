@@ -7,6 +7,7 @@
 package org.hibernate.models.source.internal.explicit;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Repeatable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,12 +17,14 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.hibernate.models.source.AnnotationAccessException;
+import org.hibernate.models.source.internal.AnnotationDescriptorRegistryImpl;
 import org.hibernate.models.source.internal.AnnotationHelper;
 import org.hibernate.models.source.internal.standard.annotations.ArrayValueDescriptor;
 import org.hibernate.models.source.internal.standard.annotations.EnumValueExtractor;
 import org.hibernate.models.source.internal.standard.annotations.ValueExtractor;
 import org.hibernate.models.source.spi.AnnotationAttributeDescriptor;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
+import org.hibernate.models.source.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.source.spi.AnnotationTarget;
 import org.hibernate.models.source.spi.AnnotationUsage;
 
@@ -159,8 +162,26 @@ public class AnnotationDescriptorImpl<A extends Annotation> implements Annotatio
 		return "AnnotationDescriptor(" + annotationType.getName() + ")";
 	}
 
-	public static <A extends Annotation> AnnotationDescriptorImpl<A> buildDescriptor(Class<A> annotationType) {
-		return buildDescriptor( annotationType, null );
+	public static <A extends Annotation> AnnotationDescriptorImpl<A> buildDescriptor(
+			Class<A> annotationType,
+			AnnotationDescriptorRegistry descriptorRegistry) {
+		return buildDescriptor(
+				annotationType,
+				resolveRepeatableContainerDescriptor( annotationType, descriptorRegistry )
+		);
+	}
+
+	public static <A extends Annotation, C extends Annotation> AnnotationDescriptor<C> resolveRepeatableContainerDescriptor(
+			Class<A> annotationType,
+			AnnotationDescriptorRegistry descriptorRegistry) {
+		final Repeatable repeatableAnnotation = annotationType.getAnnotation( Repeatable.class );
+		if ( repeatableAnnotation == null ) {
+			return null;
+		}
+		//noinspection unchecked
+		final AnnotationDescriptor<C> containerDescriptor = (AnnotationDescriptor<C>) descriptorRegistry.getDescriptor( repeatableAnnotation.value() );
+		( (AnnotationDescriptorRegistryImpl) descriptorRegistry ).register( containerDescriptor );
+		return containerDescriptor;
 	}
 
 	public static <A extends Annotation> AnnotationDescriptorImpl<A> buildDescriptor(

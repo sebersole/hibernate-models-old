@@ -44,12 +44,17 @@ import java.util.SortedSet;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Comment;
+import org.hibernate.models.source.internal.AnnotationDescriptorRegistryImpl;
 import org.hibernate.models.source.internal.SourceModelBuildingContextImpl;
 import org.hibernate.models.source.internal.explicit.AnnotationDescriptorImpl;
 import org.hibernate.models.source.internal.jandex.JandexIndexerHelper;
+import org.hibernate.models.source.internal.standard.ClassDetailsImpl;
+import org.hibernate.models.source.internal.standard.PackageDetailsImpl;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
+import org.hibernate.models.source.spi.AnnotationDescriptorRegistry;
 import org.hibernate.models.source.spi.SourceModelBuildingContext;
 
+import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.Indexer;
 
@@ -91,7 +96,7 @@ public class TestHelper {
 		}
 
 		final Index jandexIndex = indexer.complete();
-		return new SourceModelBuildingContextImpl(
+		final SourceModelBuildingContextImpl buildingContext = new SourceModelBuildingContextImpl(
 				SIMPLE_CLASS_LOADING,
 				jandexIndex,
 				(contributions, buildingContext1) -> {
@@ -101,6 +106,30 @@ public class TestHelper {
 					contributions.registerAnnotation( NAMED_QUERIES );
 				}
 		);
+
+		final AnnotationDescriptorRegistry annotationDescriptorRegistry = buildingContext.getAnnotationDescriptorRegistry();
+		for ( ClassInfo knownClass : jandexIndex.getKnownClasses() ) {
+			if ( knownClass.simpleName().endsWith( "package-info" ) ) {
+				new PackageDetailsImpl( knownClass, buildingContext );
+				continue;
+			}
+
+			if ( knownClass.isAnnotation() ) {
+				final Class<? extends Annotation> annotationClass = buildingContext
+						.getClassLoadingAccess()
+						.classForName( knownClass.name().toString() );
+				if ( annotationDescriptorRegistry.getDescriptor( annotationClass ) == null ) {
+					final AnnotationDescriptorImpl<? extends Annotation> annotationDescriptor = AnnotationDescriptorImpl.buildDescriptor(
+							annotationClass,
+							annotationDescriptorRegistry
+					);
+					( (AnnotationDescriptorRegistryImpl) annotationDescriptorRegistry ).register( annotationDescriptor );
+				}
+			}
+
+			new ClassDetailsImpl( knownClass, buildingContext );
+		}
+		return buildingContext;
 	}
 
 	public static <A extends Annotation > AnnotationDescriptor<A> createDescriptor(Class<A> annotationType) {

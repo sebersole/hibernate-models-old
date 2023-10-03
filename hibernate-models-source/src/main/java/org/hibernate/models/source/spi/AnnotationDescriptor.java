@@ -58,21 +58,4 @@ public interface AnnotationDescriptor<A extends Annotation> extends AnnotationTa
 	 * for the {@linkplain Repeatable#value() container} annotation.
 	 */
 	AnnotationDescriptor<?> getRepeatableContainer();
-
-
-	static <A extends Annotation> AnnotationDescriptor<A> createDescriptor(
-			Class<A> javaType,
-			SourceModelBuildingContext buildingContext) {
-		final Repeatable repeatable = javaType.getAnnotation( Repeatable.class );
-		final AnnotationDescriptor<? extends Annotation> containerDescriptor;
-		if ( repeatable != null ) {
-			containerDescriptor = buildingContext.getAnnotationDescriptorRegistry().getDescriptor( repeatable.value() );
-			assert containerDescriptor != null;
-		}
-		else {
-			containerDescriptor = null;
-		}
-
-		return new AnnotationDescriptorImpl<>( javaType, containerDescriptor, buildingContext );
-	}
 }

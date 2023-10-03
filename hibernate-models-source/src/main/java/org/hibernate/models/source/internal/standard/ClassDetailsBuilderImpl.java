@@ -28,11 +28,11 @@ public class ClassDetailsBuilderImpl implements ClassDetailsBuilder {
 
 	@Override
 	public ClassDetails buildClassDetails(String name, SourceModelBuildingContext processingContext) {
-		return buildClassDetailsStatic( name, processingContext.getJandexView(), processingContext );
+		return buildClassDetailsStatic( name, processingContext.getJandexIndex(), processingContext );
 	}
 
 	public static ClassDetails buildClassDetailsStatic(String name, SourceModelBuildingContext processingContext) {
-		return buildClassDetailsStatic( name, processingContext.getJandexView(), processingContext );
+		return buildClassDetailsStatic( name, processingContext.getJandexIndex(), processingContext );
 	}
 
 	public static ClassDetails buildClassDetailsStatic(

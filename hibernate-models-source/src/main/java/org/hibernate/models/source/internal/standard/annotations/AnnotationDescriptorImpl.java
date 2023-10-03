@@ -52,7 +52,7 @@ public class AnnotationDescriptorImpl<A extends Annotation>
 	private static <A extends Annotation> ClassInfo resolveClassInfo(
 			Class<A> annotationType,
 			SourceModelBuildingContext buildingContext) {
-		return buildingContext.getJandexView().getClassByName( annotationType );
+		return buildingContext.getJandexIndex().getClassByName( annotationType );
 	}
 
 	public AnnotationDescriptorImpl(

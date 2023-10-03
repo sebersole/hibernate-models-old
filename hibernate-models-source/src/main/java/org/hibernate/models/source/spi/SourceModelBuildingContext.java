@@ -37,14 +37,9 @@ public interface SourceModelBuildingContext extends NamedAnnotationScope {
 	ClassLoading getClassLoadingAccess();
 
 	/**
-	 * Access to the Classmate functionality
-	 */
-	ClassmateContext getClassmateContext();
-
-	/**
 	 * Access to the pre-built Jandex index}, if any.
 	 */
-	IndexView getJandexView();
+	IndexView getJandexIndex();
 
 	@Override
 	default SourceModelBuildingContext getSourceModelBuildingContext() {

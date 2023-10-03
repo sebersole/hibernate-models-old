@@ -18,6 +18,10 @@ public interface AnnotationDescriptorRegistry {
 	 * Get the descriptor for the given annotation {@code type}
 	 */
 	<A extends Annotation> AnnotationDescriptor<A> getDescriptor(Class<A> javaType);
+	/**
+	 * Get the descriptor for the given annotation {@code type}
+	 */
+	<A extends Annotation> AnnotationDescriptor<A> resolveDescriptor(Class<A> javaType, DescriptorCreator<A> creator);
 
 	/**
 	 * Assuming the {@code descriptor} is a {@linkplain AnnotationDescriptor#getRepeatableContainer() repeatable container},
@@ -29,4 +33,9 @@ public interface AnnotationDescriptorRegistry {
 	 * Shorthand for {@code getRepeatableDescriptor( getDescriptor( javaType ) )}
 	 */
 	<A extends Annotation> AnnotationDescriptor<A> getContainedRepeatableDescriptor(Class<A> javaType);
+
+	@FunctionalInterface
+	interface DescriptorCreator<A extends Annotation> {
+		AnnotationDescriptor<A> createDescriptor(Class<A> annotationType);
+	}
 }
