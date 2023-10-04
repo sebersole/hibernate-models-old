@@ -8,8 +8,12 @@ package org.hibernate.models.orm.process;
 
 import java.io.IOException;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JavaTypeRegistration;
 import org.hibernate.boot.model.jandex.JandexIndexer;
+import org.hibernate.id.IncrementGenerator;
+import org.hibernate.id.uuid.UuidGenerator;
+import org.hibernate.models.orm.process.internal.IdGeneratorRegistration;
 import org.hibernate.models.orm.process.internal.ManagedResourcesImpl;
 import org.hibernate.models.orm.process.spi.ManagedResources;
 import org.hibernate.models.orm.process.spi.ProcessResult;
@@ -31,7 +35,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOADING;
@@ -40,6 +46,18 @@ import static org.hibernate.models.internal.SimpleClassLoading.SIMPLE_CLASS_LOAD
  * @author Steve Ebersole
  */
 public class ProcessorTests {
+	private static final Processor.Options processOptions = new Processor.Options() {
+		@Override
+		public boolean shouldIgnoreUnlistedClasses() {
+			return false;
+		}
+
+		@Override
+		public boolean areGeneratorsGlobal() {
+			return true;
+		}
+	};
+
 	@Test
 	void testSimple() {
 		final ManagedResourcesImpl.Builder managedResourcesBuilder = new ManagedResourcesImpl.Builder();
@@ -64,7 +82,7 @@ public class ProcessorTests {
 				indexer.complete()
 		);
 
-		final ProcessResult processResult = Processor.process( managedResources, false, buildingContext );
+		final ProcessResult processResult = Processor.process( managedResources, processOptions, buildingContext );
 		assertThat( processResult.getEntityHierarchies() ).hasSize( 1 );
 		final EntityHierarchy hierarchy = processResult.getEntityHierarchies().iterator().next();
 		assertThat( hierarchy.getInheritanceType() ).isEqualTo( InheritanceType.SINGLE_TABLE );
@@ -86,6 +104,17 @@ public class ProcessorTests {
 		assertThat( processResult.getJavaTypeRegistrations().get( 0 ).getDomainType().getClassName() ).isEqualTo( String.class.getName() );
 		assertThat( processResult.getJavaTypeRegistrations().get( 0 ).getDescriptor() ).isNotNull();
 		assertThat( processResult.getJavaTypeRegistrations().get( 0 ).getDescriptor().getClassName() ).endsWith( "StringJavaType" );
+
+		assertThat( processResult.getGlobalIdGeneratorRegistrations() ).hasSize( 3 );
+		assertThat( processResult.getGlobalIdGeneratorRegistrations() ).containsKeys( "seq_gen", "tbl_gen", "increment_gen" );
+
+		final IdGeneratorRegistration seqGen = processResult.getGlobalIdGeneratorRegistrations().get( "seq_gen" );
+		assertThat( seqGen.getConfiguration().getAnnotationDescriptor().getAnnotationType() ).isEqualTo( SequenceGenerator.class );
+		assertThat( seqGen.getConfiguration().getAttributeValue( "sequenceName" ).asString() ).isEqualTo( "id_seq" );
+
+		final IdGeneratorRegistration tblGen = processResult.getGlobalIdGeneratorRegistrations().get( "tbl_gen" );
+		assertThat( tblGen.getConfiguration().getAnnotationDescriptor().getAnnotationType() ).isEqualTo( TableGenerator.class );
+		assertThat( tblGen.getConfiguration().getAttributeValue( "table" ).asString() ).isEqualTo( "id_tbl" );
 	}
 
 	@Test
@@ -103,7 +132,7 @@ public class ProcessorTests {
 				indexer.complete()
 		);
 
-		final ProcessResult processResult = Processor.process( managedResources, false, buildingContext );
+		final ProcessResult processResult = Processor.process( managedResources, processOptions, buildingContext );
 		assertThat( processResult.getEntityHierarchies() ).hasSize( 1 );
 		final EntityHierarchy hierarchy = processResult.getEntityHierarchies().iterator().next();
 		assertThat( hierarchy.getInheritanceType() ).isEqualTo( InheritanceType.JOINED );
@@ -132,6 +161,9 @@ public class ProcessorTests {
 
 	@Entity(name="Person")
 	@Table(name="persons")
+	@SequenceGenerator(name = "seq_gen", sequenceName = "id_seq")
+	@TableGenerator(name = "tbl_gen", table = "id_tbl")
+	@GenericGenerator(name = "increment_gen", type = IncrementGenerator.class)
 	@JavaTypeRegistration(javaType = String.class, descriptorClass = StringJavaType.class)
 	public static class Person {
 		@Id

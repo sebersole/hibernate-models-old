@@ -7,6 +7,7 @@
 package org.hibernate.models.orm.process.internal;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.models.orm.spi.EntityHierarchy;
@@ -25,6 +26,7 @@ public class ProcessResultImpl implements ProcessResult {
 	private final List<CompositeUserTypeRegistration> compositeUserTypeRegistrations;
 	private final List<CollectionTypeRegistration> collectionTypeRegistrations;
 	private final List<EmbeddableInstantiatorRegistration> embeddableInstantiatorRegistrations;
+	private final Map<String, IdGeneratorRegistration> globalIdGeneratorRegistrations;
 
 	public ProcessResultImpl(
 			Set<EntityHierarchy> entityHierarchies,
@@ -34,7 +36,8 @@ public class ProcessResultImpl implements ProcessResult {
 			List<UserTypeRegistration> userTypeRegistrations,
 			List<CompositeUserTypeRegistration> compositeUserTypeRegistrations,
 			List<CollectionTypeRegistration> collectionTypeRegistrations,
-			List<EmbeddableInstantiatorRegistration> embeddableInstantiatorRegistrations) {
+			List<EmbeddableInstantiatorRegistration> embeddableInstantiatorRegistrations,
+			Map<String, IdGeneratorRegistration> globalIdGeneratorRegistrations) {
 		this.entityHierarchies = entityHierarchies;
 		this.javaTypeRegistrations = javaTypeRegistrations;
 		this.jdbcTypeRegistrations = jdbcTypeRegistrations;
@@ -43,6 +46,7 @@ public class ProcessResultImpl implements ProcessResult {
 		this.compositeUserTypeRegistrations = compositeUserTypeRegistrations;
 		this.collectionTypeRegistrations = collectionTypeRegistrations;
 		this.embeddableInstantiatorRegistrations = embeddableInstantiatorRegistrations;
+		this.globalIdGeneratorRegistrations = globalIdGeneratorRegistrations;
 	}
 
 	@Override
@@ -83,5 +87,10 @@ public class ProcessResultImpl implements ProcessResult {
 	@Override
 	public List<EmbeddableInstantiatorRegistration> getEmbeddableInstantiatorRegistrations() {
 		return embeddableInstantiatorRegistrations;
+	}
+
+	@Override
+	public Map<String, IdGeneratorRegistration> getGlobalIdGeneratorRegistrations() {
+		return globalIdGeneratorRegistrations;
 	}
 }

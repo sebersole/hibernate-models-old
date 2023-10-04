@@ -9,6 +9,7 @@ package org.hibernate.models.orm.process.internal;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.models.internal.StringHelper;
 import org.hibernate.models.orm.spi.HibernateAnnotations;
 import org.hibernate.models.orm.spi.JpaAnnotations;
 import org.hibernate.models.orm.spi.OrmModelBuildingContext;
@@ -16,6 +17,7 @@ import org.hibernate.models.source.spi.AnnotationTarget;
 
 import static org.hibernate.models.orm.process.internal.TypeContributionProcessor.processTypeContributions;
 import static org.hibernate.models.orm.spi.HibernateAnnotations.GENERIC_GENERATOR;
+import static org.hibernate.models.orm.spi.HibernateAnnotations.UUID_GENERATOR;
 import static org.hibernate.models.orm.spi.JpaAnnotations.NAMED_ENTITY_GRAPH;
 import static org.hibernate.models.orm.spi.JpaAnnotations.SEQUENCE_GENERATOR;
 import static org.hibernate.models.orm.spi.JpaAnnotations.TABLE_GENERATOR;
@@ -27,20 +29,29 @@ import static org.hibernate.models.orm.spi.JpaAnnotations.TABLE_GENERATOR;
  * @author Steve Ebersole
  */
 public class GlobalAnnotationProcessor {
+	public interface Options {
+		boolean areGeneratorsGlobal();
+	}
+
 	private final ProcessResultCollector resultCollector;
+	private final Options options;
 	private final OrmModelBuildingContext processingContext;
 	private final Set<String> processedGlobalAnnotationSources = new HashSet<>();
 
-	public GlobalAnnotationProcessor(ProcessResultCollector resultCollector, OrmModelBuildingContext processingContext) {
+	public GlobalAnnotationProcessor(
+			ProcessResultCollector resultCollector,
+			Options options,
+			OrmModelBuildingContext processingContext) {
 		this.resultCollector = resultCollector;
+		this.options = options;
 		this.processingContext = processingContext;
 	}
 
 	public void processGlobalAnnotations(AnnotationTarget annotationTarget) {
-		if ( processedGlobalAnnotationSources.contains( annotationTarget.getName() ) ) {
+		if ( !processedGlobalAnnotationSources.add( annotationTarget.getName() ) ) {
+			// we've already processed this target
 			return;
 		}
-		processedGlobalAnnotationSources.add( annotationTarget.getName() );
 
 		processTypeContributions( annotationTarget, resultCollector, processingContext.getSourceModel().getClassDetailsRegistry() );
 
@@ -51,26 +62,52 @@ public class GlobalAnnotationProcessor {
 	}
 
 	private void processGenerators(AnnotationTarget annotationTarget) {
-		processSequenceGenerators( annotationTarget );
-		processTableGenerators( annotationTarget );
-		processGenericGenerators( annotationTarget );
+		// collect the generators as global if either -
+		//		1. target is a package
+		//		2. `options.areGeneratorsGlobal()` is true
+		if ( annotationTarget.getKind() == AnnotationTarget.Kind.PACKAGE
+				|| options.areGeneratorsGlobal() ) {
+			processSequenceGenerators( annotationTarget );
+			processTableGenerators( annotationTarget );
+			processGenericGenerators( annotationTarget );
+			// todo : @IdGeneratorType - META
+			// NOTE : @UUIDGenerator can only be local to the id attribute
+		}
 	}
 
 	private void processSequenceGenerators(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( SEQUENCE_GENERATOR, (usage) -> {
-			// todo (annotation-source) : implement
+			final String generatorName = usage.extractAttributeValue( "name" );
+			assert generatorName != null;
+			resultCollector.collectGlobalIdGeneratorRegistration(
+					generatorName,
+					IdGeneratorRegistration.Kind.SEQUENCE,
+					usage
+			);
 		} );
 	}
 
 	private void processTableGenerators(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( TABLE_GENERATOR, (usage) -> {
-			// todo (annotation-source) : implement
+			final String generatorName = usage.extractAttributeValue( "name" );
+			assert generatorName != null;
+			resultCollector.collectGlobalIdGeneratorRegistration(
+					generatorName,
+					IdGeneratorRegistration.Kind.TABLE,
+					usage
+			);
 		} );
 	}
 
 	private void processGenericGenerators(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( GENERIC_GENERATOR, (usage) -> {
-			// todo (annotation-source) : implement
+			final String generatorName = usage.extractAttributeValue( "name" );
+			assert generatorName != null;
+			resultCollector.collectGlobalIdGeneratorRegistration(
+					generatorName,
+					IdGeneratorRegistration.Kind.GENERIC,
+					usage
+			);
 		} );
 	}
 

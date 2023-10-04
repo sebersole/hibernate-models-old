@@ -35,12 +35,20 @@ import static org.hibernate.models.orm.internal.EntityHierarchyBuilder.createEnt
 import static org.hibernate.models.orm.internal.EntityHierarchyBuilder.isRoot;
 
 /**
+ * Processes {@linkplain ManagedResources managed resources} and produces a
+ * {@linkplain ProcessResult result} which collects broad categorizations of the
+ * classes defined by those resources based on annotations (and XML mappings).
+ *
  * @author Steve Ebersole
  */
 public class Processor {
+	public interface Options extends GlobalAnnotationProcessor.Options {
+		boolean shouldIgnoreUnlistedClasses();
+	}
+
 	public static ProcessResult process(
 			ManagedResources managedResources,
-			boolean ignoreUnlisted,
+			Options options,
 			SourceModelBuildingContext sourceModelBuildingContext) {
 		fillRegistries( sourceModelBuildingContext );
 
@@ -53,27 +61,29 @@ public class Processor {
 				sourceModelBuildingContext.getJandexIndex()
 		);
 
-		return process( managedResources, ignoreUnlisted, ormModelBuildingContext );
+		return process( managedResources, options, ormModelBuildingContext );
 	}
 
 	public static ProcessResult process(
 			ManagedResources managedResources,
-			boolean ignoreUnlisted,
+			Options options,
 			OrmModelBuildingContext mappingBuildingContext) {
 		final Set<ClassDetails> rootEntities = new HashSet<>();
 		final Set<ClassDetails> mappedSuperClasses = new HashSet<>();
 		final ProcessResultCollector processResultCollector = new ProcessResultCollector();
 		final GlobalAnnotationProcessor globalAnnotationProcessor = new GlobalAnnotationProcessor(
 				processResultCollector,
+				options,
 				mappingBuildingContext
 		);
 
-		if ( ignoreUnlisted ) {
+		if ( options.shouldIgnoreUnlistedClasses() ) {
 			processOnlyListed(
 					managedResources,
 					rootEntities,
 					mappedSuperClasses,
 					globalAnnotationProcessor,
+					options,
 					mappingBuildingContext
 			);
 		}
@@ -82,6 +92,7 @@ public class Processor {
 					rootEntities,
 					mappedSuperClasses,
 					globalAnnotationProcessor,
+					options,
 					mappingBuildingContext
 			);
 		}
@@ -140,6 +151,7 @@ public class Processor {
 			Set<ClassDetails> rootEntities,
 			Set<ClassDetails> mappedSuperClasses,
 			GlobalAnnotationProcessor globalAnnotationProcessor,
+			Options options,
 			OrmModelBuildingContext mappingBuildingContext) {
 		final ClassDetailsRegistry classDetailsRegistry = mappingBuildingContext
 				.getSourceModel()
@@ -178,6 +190,7 @@ public class Processor {
 				rootEntities,
 				mappedSuperClasses,
 				globalAnnotationProcessor,
+				options,
 				mappingBuildingContext
 		);
 	}
@@ -186,13 +199,14 @@ public class Processor {
 			Set<ClassDetails> rootEntities,
 			Set<ClassDetails> mappedSuperClasses,
 			GlobalAnnotationProcessor globalAnnotationProcessor,
-			OrmModelBuildingContext mappingBuildingContext) {
+			Options options, OrmModelBuildingContext mappingBuildingContext) {
 		processResources(
 				null,
 				null,
 				rootEntities,
 				mappedSuperClasses,
 				globalAnnotationProcessor,
+				options,
 				mappingBuildingContext
 		);
 	}
@@ -203,6 +217,7 @@ public class Processor {
 			Set<ClassDetails> rootEntities,
 			Set<ClassDetails> mappedSuperClasses,
 			GlobalAnnotationProcessor globalAnnotationProcessor,
+			Options options,
 			OrmModelBuildingContext mappingBuildingContext) {
 		final ClassDetailsRegistry classDetailsRegistry = mappingBuildingContext
 				.getSourceModel()

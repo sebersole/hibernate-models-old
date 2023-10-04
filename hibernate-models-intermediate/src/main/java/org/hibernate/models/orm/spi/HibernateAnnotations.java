@@ -7,6 +7,7 @@
 package org.hibernate.models.orm.spi;
 
 import org.hibernate.annotations.*;
+import org.hibernate.id.IncrementGenerator;
 import org.hibernate.models.source.spi.AnnotationDescriptor;
 
 import static org.hibernate.models.orm.internal.AnnotationHelper.createOrmDescriptor;

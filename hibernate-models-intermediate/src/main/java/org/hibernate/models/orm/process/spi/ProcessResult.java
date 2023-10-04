@@ -7,18 +7,22 @@
 package org.hibernate.models.orm.process.spi;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.models.orm.process.internal.CollectionTypeRegistration;
 import org.hibernate.models.orm.process.internal.CompositeUserTypeRegistration;
 import org.hibernate.models.orm.process.internal.ConversionRegistration;
 import org.hibernate.models.orm.process.internal.EmbeddableInstantiatorRegistration;
+import org.hibernate.models.orm.process.internal.IdGeneratorRegistration;
 import org.hibernate.models.orm.process.internal.JavaTypeRegistration;
 import org.hibernate.models.orm.process.internal.JdbcTypeRegistration;
 import org.hibernate.models.orm.process.internal.UserTypeRegistration;
 import org.hibernate.models.orm.spi.EntityHierarchy;
 
 /**
+ * The result of {@linkplain Processor#process processing} the domain model
+ *
  * @author Steve Ebersole
  */
 public interface ProcessResult {
@@ -37,4 +41,6 @@ public interface ProcessResult {
 	List<CollectionTypeRegistration> getCollectionTypeRegistrations();
 
 	List<EmbeddableInstantiatorRegistration> getEmbeddableInstantiatorRegistrations();
+
+	Map<String, IdGeneratorRegistration> getGlobalIdGeneratorRegistrations();
 }

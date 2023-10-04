@@ -6,15 +6,28 @@
  */
 package org.hibernate.models.orm.process.internal;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.metamodel.CollectionClassification;
 import org.hibernate.models.orm.process.spi.ProcessResult;
 import org.hibernate.models.orm.spi.EntityHierarchy;
+import org.hibernate.models.source.ModelsException;
+import org.hibernate.models.source.spi.AnnotationUsage;
 import org.hibernate.models.source.spi.ClassDetails;
+
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.TableGenerator;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 /**
  * @author Steve Ebersole
@@ -27,6 +40,7 @@ public class ProcessResultCollector {
 	private List<CompositeUserTypeRegistration> compositeUserTypeRegistrations;
 	private List<CollectionTypeRegistration> collectionTypeRegistrations;
 	private List<EmbeddableInstantiatorRegistration> embeddableInstantiatorRegistrations;
+	private Map<String, IdGeneratorRegistration> globalIdGeneratorRegistrations;
 
 	public List<JavaTypeRegistration> getJavaTypeRegistrations() {
 		return javaTypeRegistrations;
@@ -108,16 +122,28 @@ public class ProcessResultCollector {
 		embeddableInstantiatorRegistrations.add( new EmbeddableInstantiatorRegistration( embeddableClass, instantiator ) );
 	}
 
+	public void collectGlobalIdGeneratorRegistration(
+			String name,
+			IdGeneratorRegistration.Kind kind,
+			AnnotationUsage<? extends Annotation> annotation) {
+		if ( globalIdGeneratorRegistrations == null ) {
+			globalIdGeneratorRegistrations = new HashMap<>();
+		}
+
+		globalIdGeneratorRegistrations.put( name, new IdGeneratorRegistration( name, kind, annotation ) );
+	}
+
 	public ProcessResult createResult(Set<EntityHierarchy> entityHierarchies) {
 		return new ProcessResultImpl(
 				entityHierarchies,
-				javaTypeRegistrations,
-				jdbcTypeRegistrations,
-				converterRegistrations,
-				userTypeRegistrations,
-				compositeUserTypeRegistrations,
-				collectionTypeRegistrations,
-				embeddableInstantiatorRegistrations
+				javaTypeRegistrations == null ? emptyList() : javaTypeRegistrations,
+				jdbcTypeRegistrations == null ? emptyList() : jdbcTypeRegistrations,
+				converterRegistrations == null ? emptyList() : converterRegistrations,
+				userTypeRegistrations == null ? emptyList() : userTypeRegistrations,
+				compositeUserTypeRegistrations == null ? emptyList() : compositeUserTypeRegistrations,
+				collectionTypeRegistrations == null ? emptyList() : collectionTypeRegistrations,
+				embeddableInstantiatorRegistrations == null ? emptyList() : embeddableInstantiatorRegistrations,
+				globalIdGeneratorRegistrations == null ? emptyMap() : globalIdGeneratorRegistrations
 		);
 	}
 }

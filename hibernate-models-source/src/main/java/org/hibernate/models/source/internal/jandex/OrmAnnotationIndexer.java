@@ -26,8 +26,15 @@ import org.hibernate.generator.internal.GeneratedAlwaysGeneration;
 import org.hibernate.generator.internal.GeneratedGeneration;
 import org.hibernate.generator.internal.SourceGeneration;
 import org.hibernate.generator.internal.TenantIdGeneration;
+import org.hibernate.id.BulkInsertionCapableIdentifierGenerator;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.id.IncrementGenerator;
+import org.hibernate.id.OptimizableGenerator;
+import org.hibernate.id.PersistentIdentifierGenerator;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import org.hibernate.id.enhanced.TableGenerator;
+import org.hibernate.id.factory.spi.StandardGenerator;
 import org.hibernate.metamodel.CollectionClassification;
 import org.hibernate.property.access.spi.PropertyAccessStrategy;
 import org.hibernate.tuple.VmValueGeneration;
@@ -230,6 +237,7 @@ public class OrmAnnotationIndexer {
 			AttributeAccessorBinder.class,
 			BasicJavaType.class,
 			BeforeExecutionGenerator.class,
+			BulkInsertionCapableIdentifierGenerator.class,
 			CacheConcurrencyStrategy.class,
 			CacheModeType.class,
 			CascadeType.class,
@@ -251,6 +259,7 @@ public class OrmAnnotationIndexer {
 			GenerationTime.class,
 			Generator.class,
 			IdentifierGenerator.class,
+			IncrementGenerator.class,
 			org.hibernate.metamodel.spi.Instantiator.class,
 			org.hibernate.type.descriptor.java.JavaType.class,
 			org.hibernate.type.descriptor.jdbc.JdbcType.class,
@@ -261,11 +270,16 @@ public class OrmAnnotationIndexer {
 			OnDeleteAction.class,
 			OnExecutionGenerator.class,
 			OptimisticLockType.class,
+			OptimizableGenerator.class,
+			PersistentIdentifierGenerator.class,
 			PolymorphismType.class,
 			PropertyAccessStrategy.class,
 			ResultCheckStyle.class,
+			SequenceStyleGenerator.class,
 			SourceGeneration.class,
 			SourceType.class,
+			StandardGenerator.class,
+			TableGenerator.class,
 			TenantIdBinder.class,
 			TenantIdGeneration.class,
 			TimeZoneStorageType.class,
