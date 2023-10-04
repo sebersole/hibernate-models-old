@@ -173,7 +173,7 @@ public class Processor {
 					listedPackages.add( packageDetails );
 				}
 				else {
-					// todo : exception?
+					// todo (models) : exception?
 				}
 			}
 		}

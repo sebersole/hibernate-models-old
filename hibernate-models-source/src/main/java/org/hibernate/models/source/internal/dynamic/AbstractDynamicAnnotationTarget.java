@@ -36,7 +36,7 @@ public abstract class AbstractDynamicAnnotationTarget implements DynamicAnnotati
 
 	@Override
 	public <X extends Annotation> void apply(List<AnnotationUsage<X>> annotationUsages) {
-		// todo (annotation-source) : handle meta-annotations
+		// todo (models) : handle meta-annotations
 		annotationUsages.forEach( this::apply );
 	}
 
@@ -44,7 +44,7 @@ public abstract class AbstractDynamicAnnotationTarget implements DynamicAnnotati
 	 * Applies the given {@code annotationUsage} to this target.
 	 *
 	 * @apiNote
-	 * todo (annotation-source) : It is undefined currently what happens if the
+	 * todo (models) : It is undefined currently what happens if the
 	 * 		{@link AnnotationUsage#getAnnotationDescriptor() annotation type} is
 	 * 		already applied on this target.
 	 */
@@ -56,7 +56,7 @@ public abstract class AbstractDynamicAnnotationTarget implements DynamicAnnotati
 		final AnnotationUsage<?> previous = usagesMap.put( annotationJavaType, annotationUsage );
 
 		if ( previous != null ) {
-			// todo (annotation-source) : ignore?  log?  exception?
+			// todo (models) : ignore?  log?  exception?
 		}
 	}
 

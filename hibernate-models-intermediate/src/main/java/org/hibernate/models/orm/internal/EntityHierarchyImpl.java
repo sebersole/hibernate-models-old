@@ -43,7 +43,7 @@ public class EntityHierarchyImpl implements EntityHierarchy {
 	private final Caching caching;
 	private final NaturalIdCaching naturalIdCaching;
 
-	// todo (annotation-source) : version?  row-id?  tenant-id?  others?
+	// todo (models) : version?  row-id?  tenant-id?  others?
 
 	public EntityHierarchyImpl(
 			ClassDetails rootEntityClassDetails,

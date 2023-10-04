@@ -70,7 +70,7 @@ public class GlobalAnnotationProcessor {
 			processSequenceGenerators( annotationTarget );
 			processTableGenerators( annotationTarget );
 			processGenericGenerators( annotationTarget );
-			// todo : @IdGeneratorType - META
+			// todo (models) : @IdGeneratorType - META
 			// NOTE : @UUIDGenerator can only be local to the id attribute
 		}
 	}
@@ -119,40 +119,40 @@ public class GlobalAnnotationProcessor {
 
 	private void processNamedQuery(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( JpaAnnotations.NAMED_QUERY, (usage) -> {
-			// todo (annotation-source) : implement
+			// todo (models)  : implement
 		} );
 
 		annotationTarget.forEachAnnotation( HibernateAnnotations.NAMED_QUERY, (usage) -> {
-			// todo (annotation-source) : implement
+			// todo (models)  : implement
 		} );
 	}
 
 	private void processNamedNativeQuery(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( JpaAnnotations.NAMED_NATIVE_QUERY, (usage) -> {
-			// todo (annotation-source) : implement
+			// todo (models)  : implement
 		} );
 
 		annotationTarget.forEachAnnotation( HibernateAnnotations.NAMED_NATIVE_QUERY, (usage) -> {
-			// todo (annotation-source) : implement
+			// todo (models)  : implement
 		} );
 	}
 
 
 	private void processNamedProcedureQuery(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( JpaAnnotations.NAMED_STORED_PROCEDURE_QUERY, (usage) -> {
-			// todo (annotation-source) : implement
+			// todo (models) : implement
 		} );
 	}
 
 	private void processNamedEntityGraphs(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( NAMED_ENTITY_GRAPH, (usage) -> {
-			// todo (annotation-source) : implement
+			// todo (models) : implement
 		} );
 	}
 
 	private void processFilterDefinitions(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( HibernateAnnotations.FILTER_DEF, (usage) -> {
-			// todo (annotation-source) : implement
+			// todo (models) : implement
 		} );
 	}
 }

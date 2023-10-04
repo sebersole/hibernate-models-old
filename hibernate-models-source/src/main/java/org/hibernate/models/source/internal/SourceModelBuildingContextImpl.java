@@ -152,7 +152,7 @@ public class SourceModelBuildingContextImpl implements SourceModelBuildingContex
 
 	@Override
 	public void registerUsage(AnnotationUsage<? extends Annotation> usage) {
-		// todo (annotation-source) : we only care about this in specific cases.
+		// todo (models) : we only care about this in specific cases.
 		//		this feeds a Map used to locate annotations regardless of target.
 		//		this is used when locating "global" annotations such as generators,
 		//		named-queries, etc.

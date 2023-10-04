@@ -16,7 +16,7 @@ import org.jboss.logging.annotations.ValidIdRange;
 import static org.jboss.logging.Logger.Level.INFO;
 
 /**
- * todo (annotation-source) : find the proper min/max id range
+ * todo (models) : find the proper min/max id range
  * @author Steve Ebersole
  */
 @MessageLogger( projectCode = "HHH" )

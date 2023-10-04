@@ -82,7 +82,7 @@ public class AttributeMetadataSmokeTests {
 				.next()
 				.getRoot();
 
-		// todo (annotation-source) : the spec seems to imply that this is "undefined", but it is very unclear.
+		// todo (models) : the spec seems to imply that this is "undefined", but it is very unclear.
 		//		an error seems more appropriate
 		assertThat( mismatch.getAttributes() ).hasSize( 0 );
 	}

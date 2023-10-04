@@ -43,7 +43,7 @@ public class AnnotationHelper {
 		if ( ! annotationDescriptor.isInherited() ) {
 			// we have a case where the annotation is not marked as `@Inherited` (like JPA's annotations),
 			// so manually check up the hierarchy.
-			// todo (annotation-source) : do we need to manually check meta-annotations?
+			// todo (models) : do we need to manually check meta-annotations?
 
 			if ( base.getSuperType() != null ) {
 				return findInheritedAnnotation( base.getSuperType(), annotationDescriptor );

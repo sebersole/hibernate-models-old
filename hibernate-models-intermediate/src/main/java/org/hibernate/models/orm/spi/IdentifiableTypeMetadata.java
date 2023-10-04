@@ -50,7 +50,7 @@ public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 	 */
 	void forEachSubType(Consumer<IdentifiableTypeMetadata> consumer);
 
-//	// todo (annotation-source) - id, version, etc
+//	// todo (models) : id, version, etc
 //
 //	List<CallbacksMetadata> getJpaCallbacks();
 //	void forEachJpaCallback(Consumer<CallbacksMetadata> consumer);

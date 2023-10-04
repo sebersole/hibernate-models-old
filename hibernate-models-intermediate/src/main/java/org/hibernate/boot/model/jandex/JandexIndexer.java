@@ -66,14 +66,14 @@ public class JandexIndexer {
 				index( packageResource, indexer );
 			}
 
-			// todo : exception?
+			// todo (models) : exception?
 		}
 
 		for ( Class<?> loadedClass : managedResources.getLoadedClasses() ) {
 			index( loadedClass, indexer );
 		}
 
-		// todo : mapping files
+		// todo (models) : mapping files
 	}
 
 	public static void index(URL resource, Indexer indexer) {
