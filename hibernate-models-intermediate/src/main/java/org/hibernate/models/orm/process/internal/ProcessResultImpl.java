@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.hibernate.models.orm.spi.EntityHierarchy;
 import org.hibernate.models.orm.process.spi.ProcessResult;
+import org.hibernate.models.source.spi.ClassDetails;
 
 /**
  * @author Steve Ebersole
@@ -22,6 +23,7 @@ public class ProcessResultImpl implements ProcessResult {
 	private final List<JavaTypeRegistration> javaTypeRegistrations;
 	private final List<JdbcTypeRegistration> jdbcTypeRegistrations;
 	private final List<ConversionRegistration> converterRegistrations;
+	private final List<ClassDetails> autoAppliedConverters;
 	private final List<UserTypeRegistration> userTypeRegistrations;
 	private final List<CompositeUserTypeRegistration> compositeUserTypeRegistrations;
 	private final List<CollectionTypeRegistration> collectionTypeRegistrations;
@@ -33,6 +35,7 @@ public class ProcessResultImpl implements ProcessResult {
 			List<JavaTypeRegistration> javaTypeRegistrations,
 			List<JdbcTypeRegistration> jdbcTypeRegistrations,
 			List<ConversionRegistration> converterRegistrations,
+			List<ClassDetails> autoAppliedConverters,
 			List<UserTypeRegistration> userTypeRegistrations,
 			List<CompositeUserTypeRegistration> compositeUserTypeRegistrations,
 			List<CollectionTypeRegistration> collectionTypeRegistrations,
@@ -42,6 +45,7 @@ public class ProcessResultImpl implements ProcessResult {
 		this.javaTypeRegistrations = javaTypeRegistrations;
 		this.jdbcTypeRegistrations = jdbcTypeRegistrations;
 		this.converterRegistrations = converterRegistrations;
+		this.autoAppliedConverters = autoAppliedConverters;
 		this.userTypeRegistrations = userTypeRegistrations;
 		this.compositeUserTypeRegistrations = compositeUserTypeRegistrations;
 		this.collectionTypeRegistrations = collectionTypeRegistrations;
@@ -67,6 +71,11 @@ public class ProcessResultImpl implements ProcessResult {
 	@Override
 	public List<ConversionRegistration> getConverterRegistrations() {
 		return converterRegistrations;
+	}
+
+	@Override
+	public List<ClassDetails> getAutoAppliedConverters() {
+		return autoAppliedConverters;
 	}
 
 	@Override

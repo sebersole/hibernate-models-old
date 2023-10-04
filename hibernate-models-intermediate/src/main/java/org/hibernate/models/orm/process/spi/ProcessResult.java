@@ -19,6 +19,7 @@ import org.hibernate.models.orm.process.internal.JavaTypeRegistration;
 import org.hibernate.models.orm.process.internal.JdbcTypeRegistration;
 import org.hibernate.models.orm.process.internal.UserTypeRegistration;
 import org.hibernate.models.orm.spi.EntityHierarchy;
+import org.hibernate.models.source.spi.ClassDetails;
 
 /**
  * The result of {@linkplain Processor#process processing} the domain model
@@ -33,6 +34,8 @@ public interface ProcessResult {
 	List<JdbcTypeRegistration> getJdbcTypeRegistrations();
 
 	List<ConversionRegistration> getConverterRegistrations();
+
+	List<ClassDetails> getAutoAppliedConverters();
 
 	List<UserTypeRegistration> getUserTypeRegistrations();
 

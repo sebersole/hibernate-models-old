@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -153,6 +154,7 @@ public class JandexIndexerHelper {
 			indexer.indexClass( BiConsumer.class );
 			indexer.indexClass( Function.class );
 			indexer.indexClass( BiFunction.class );
+			indexer.indexClass( UUID.class );
 		}
 		catch (IOException e) {
 			throw new JandexIndexingException( e );

@@ -23,8 +23,6 @@ import org.hibernate.boot.jaxb.mapping.JaxbJdbcTypeRegistration;
 import org.hibernate.boot.jaxb.mapping.JaxbUserTypeRegistration;
 import org.hibernate.internal.util.collections.CollectionHelper;
 import org.hibernate.models.internal.StringHelper;
-import org.hibernate.models.orm.spi.ClassmateContext;
-import org.hibernate.models.orm.spi.OrmModelBuildingContext;
 import org.hibernate.models.source.spi.AnnotationAttributeValue;
 import org.hibernate.models.source.spi.AnnotationTarget;
 import org.hibernate.models.source.spi.AnnotationUsage;
@@ -38,6 +36,7 @@ import static org.hibernate.models.orm.spi.HibernateAnnotations.EMBEDDABLE_INSTA
 import static org.hibernate.models.orm.spi.HibernateAnnotations.JAVA_TYPE_REG;
 import static org.hibernate.models.orm.spi.HibernateAnnotations.JDBC_TYPE_REG;
 import static org.hibernate.models.orm.spi.HibernateAnnotations.TYPE_REG;
+import static org.hibernate.models.orm.spi.JpaAnnotations.CONVERTER;
 import static org.hibernate.models.source.spi.AnnotationAttributeDescriptor.VALUE;
 
 /**
@@ -61,7 +60,8 @@ public class TypeContributionProcessor {
 		final TypeContributionProcessor processor = new TypeContributionProcessor( resultCollector, classDetailsRegistry );
 		processor.processJavaTypeRegistrations( annotationTarget );
 		processor.processJdbcTypeRegistrations( annotationTarget );
-		processor.processAttributeConverterRegistrations( annotationTarget );
+		processor.processConverterRegistrations( annotationTarget );
+		processor.processAutoApplyConverters( annotationTarget );
 		processor.processUserTypeRegistrations( annotationTarget );
 		processor.processCompositeUserTypeRegistrations( annotationTarget );
 		processor.processCollectionTypeRegistrations( annotationTarget );
@@ -75,7 +75,7 @@ public class TypeContributionProcessor {
 		final TypeContributionProcessor processor = new TypeContributionProcessor( resultCollector, classDetailsRegistry );
 		processor.processJavaTypeRegistrations( root.getJavaTypeRegistrations() );
 		processor.processJdbcTypeRegistrations( root.getJdbcTypeRegistrations() );
-		processor.processAttributeConverterRegistrations( root.getConverterRegistrations() );
+		processor.processConverterRegistrations( root.getConverterRegistrations() );
 		processor.processUserTypeRegistrations( root.getUserTypeRegistrations() );
 		processor.processCompositeUserTypeRegistrations( root.getCompositeUserTypeRegistrations() );
 		processor.processCollectionTypeRegistrations( root.getCollectionUserTypeRegistrations() );
@@ -131,7 +131,7 @@ public class TypeContributionProcessor {
 		) );
 	}
 
-	private void processAttributeConverterRegistrations(AnnotationTarget annotationTarget) {
+	private void processConverterRegistrations(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( CONVERTER_REG, (usage) -> {
 			final ClassDetails domainType = usage.getAttributeValue( "domainType" ).asClass();
 			final ClassDetails converterType = usage.getAttributeValue( "converter" ).asClass();
@@ -140,7 +140,23 @@ public class TypeContributionProcessor {
 		} );
 	}
 
-	private void processAttributeConverterRegistrations(List<JaxbConverterRegistration> registrations) {
+	private void processAutoApplyConverters(AnnotationTarget annotationTarget) {
+		if ( annotationTarget.getKind() != AnnotationTarget.Kind.CLASS ) {
+			// only classes can be converters we care about
+			return;
+		}
+
+		annotationTarget.forEachAnnotation( CONVERTER, (usage) -> {
+			final boolean autoApply = usage.extractAttributeValue( "autoApply" );
+			if ( !autoApply ) {
+				// we only care about auto-applied conversions here
+				return;
+			}
+			resultCollector.collectAutoAppliedConverter( (ClassDetails) annotationTarget );
+		} );
+	}
+
+	private void processConverterRegistrations(List<JaxbConverterRegistration> registrations) {
 		if ( CollectionHelper.isEmpty( registrations ) ) {
 			return;
 		}

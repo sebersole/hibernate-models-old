@@ -7,12 +7,13 @@
 package org.hibernate.models.orm.process;
 
 import java.io.IOException;
+import java.util.UUID;
 
+import org.hibernate.annotations.ConverterRegistration;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JavaTypeRegistration;
 import org.hibernate.boot.model.jandex.JandexIndexer;
 import org.hibernate.id.IncrementGenerator;
-import org.hibernate.id.uuid.UuidGenerator;
 import org.hibernate.models.orm.process.internal.IdGeneratorRegistration;
 import org.hibernate.models.orm.process.internal.ManagedResourcesImpl;
 import org.hibernate.models.orm.process.spi.ManagedResources;
@@ -30,7 +31,9 @@ import org.jboss.jandex.Indexer;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Basic;
+import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
@@ -61,7 +64,7 @@ public class ProcessorTests {
 	@Test
 	void testSimple() {
 		final ManagedResourcesImpl.Builder managedResourcesBuilder = new ManagedResourcesImpl.Builder();
-		managedResourcesBuilder.addLoadedClasses( Person.class );
+		managedResourcesBuilder.addLoadedClasses( Person.class, MyStringConverter.class );
 		final ManagedResources managedResources = managedResourcesBuilder.build();
 
 		final Indexer indexer = new Indexer();
@@ -70,6 +73,7 @@ public class ProcessorTests {
 
 		// the test also needs these indexed
 		try {
+			indexer.indexClass( MyUuidConverter.class );
 			indexer.indexClass( org.hibernate.type.descriptor.java.StringJavaType.class );
 			indexer.indexClass( org.hibernate.type.descriptor.java.AbstractClassJavaType.class );
 		}
@@ -115,6 +119,9 @@ public class ProcessorTests {
 		final IdGeneratorRegistration tblGen = processResult.getGlobalIdGeneratorRegistrations().get( "tbl_gen" );
 		assertThat( tblGen.getConfiguration().getAnnotationDescriptor().getAnnotationType() ).isEqualTo( TableGenerator.class );
 		assertThat( tblGen.getConfiguration().getAttributeValue( "table" ).asString() ).isEqualTo( "id_tbl" );
+
+		assertThat( processResult.getAutoAppliedConverters() ).hasSize( 1 );
+		assertThat( processResult.getConverterRegistrations() ).hasSize( 1 );
 	}
 
 	@Test
@@ -165,10 +172,37 @@ public class ProcessorTests {
 	@TableGenerator(name = "tbl_gen", table = "id_tbl")
 	@GenericGenerator(name = "increment_gen", type = IncrementGenerator.class)
 	@JavaTypeRegistration(javaType = String.class, descriptorClass = StringJavaType.class)
+	@ConverterRegistration(domainType = UUID.class, converter = MyUuidConverter.class)
 	public static class Person {
 		@Id
 		private Integer id;
 		private String name;
+	}
+
+	@Converter(autoApply = true)
+	public static class MyStringConverter implements AttributeConverter<String,String> {
+		@Override
+		public String convertToDatabaseColumn(String attribute) {
+			return null;
+		}
+
+		@Override
+		public String convertToEntityAttribute(String dbData) {
+			return null;
+		}
+	}
+
+	@Converter
+	public static class MyUuidConverter implements AttributeConverter<UUID,String> {
+		@Override
+		public String convertToDatabaseColumn(UUID attribute) {
+			return null;
+		}
+
+		@Override
+		public UUID convertToEntityAttribute(String dbData) {
+			return null;
+		}
 	}
 
 	@Entity(name="Root")
