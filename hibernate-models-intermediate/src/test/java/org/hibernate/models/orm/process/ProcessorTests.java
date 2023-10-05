@@ -38,6 +38,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.NamedNativeQuery;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.NamedStoredProcedureQuery;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
@@ -57,6 +60,7 @@ public class ProcessorTests {
 
 		@Override
 		public boolean areGeneratorsGlobal() {
+			// the JPA default is to consider any generator as global
 			return true;
 		}
 	};
@@ -64,9 +68,18 @@ public class ProcessorTests {
 	@Test
 	void testSimple() {
 		final ManagedResourcesImpl.Builder managedResourcesBuilder = new ManagedResourcesImpl.Builder();
-		managedResourcesBuilder.addLoadedClasses( Person.class, MyStringConverter.class );
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// ManagedResources is built by scanning and from explicit resources
+		// during ORM bootstrap
+		managedResourcesBuilder
+				.addLoadedClasses( Person.class, MyStringConverter.class )
+				.addPackages( "org.hibernate.models.orm.process" );
 		final ManagedResources managedResources = managedResourcesBuilder.build();
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// The Jandex index would generally (1) be built by WF and passed
+		// to ORM or (2) be built by ORM
 		final Indexer indexer = new Indexer();
 		JandexIndexerHelper.applyBaseline( indexer, SIMPLE_CLASS_LOADING );
 		JandexIndexer.index( managedResources, indexer, SIMPLE_CLASS_LOADING );
@@ -74,12 +87,21 @@ public class ProcessorTests {
 		// the test also needs these indexed
 		try {
 			indexer.indexClass( MyUuidConverter.class );
+			indexer.indexClass( org.hibernate.type.YesNoConverter.class );
+			indexer.indexClass( org.hibernate.type.CharBooleanConverter.class );
+			indexer.indexClass( org.hibernate.type.descriptor.converter.spi.BasicValueConverter.class );
 			indexer.indexClass( org.hibernate.type.descriptor.java.StringJavaType.class );
 			indexer.indexClass( org.hibernate.type.descriptor.java.AbstractClassJavaType.class );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( e );
 		}
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Above here is work done before hibernate-models.
+		// Below here is work done by hibernate-models.
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 		final SourceModelBuildingContextImpl buildingContext = new SourceModelBuildingContextImpl(
 				SIMPLE_CLASS_LOADING,
@@ -121,7 +143,16 @@ public class ProcessorTests {
 		assertThat( tblGen.getConfiguration().getAttributeValue( "table" ).asString() ).isEqualTo( "id_tbl" );
 
 		assertThat( processResult.getAutoAppliedConverters() ).hasSize( 1 );
-		assertThat( processResult.getConverterRegistrations() ).hasSize( 1 );
+		assertThat( processResult.getConverterRegistrations() ).hasSize( 2 );
+
+		assertThat( processResult.getJpaNamedQueries() ).hasSize( 3 );
+		assertThat( processResult.getJpaNamedQueries() ).containsKeys( "jpaHql", "jpaNative", "jpaCallable" );
+
+		assertThat( processResult.getHibernateNamedHqlQueries() ).hasSize( 1 );
+		assertThat( processResult.getHibernateNamedHqlQueries() ).containsKeys( "ormHql" );
+
+		assertThat( processResult.getHibernateNamedNativeQueries() ).hasSize( 1 );
+		assertThat( processResult.getHibernateNamedNativeQueries() ).containsKeys( "ormNative" );
 	}
 
 	@Test
@@ -173,6 +204,11 @@ public class ProcessorTests {
 	@GenericGenerator(name = "increment_gen", type = IncrementGenerator.class)
 	@JavaTypeRegistration(javaType = String.class, descriptorClass = StringJavaType.class)
 	@ConverterRegistration(domainType = UUID.class, converter = MyUuidConverter.class)
+	@NamedQuery(name = "jpaHql", query = "from Person")
+	@NamedNativeQuery(name = "jpaNative", query = "select * from persons")
+	@NamedStoredProcedureQuery(name = "jpaCallable", procedureName = "jpa_callable")
+	@org.hibernate.annotations.NamedQuery(name = "ormHql", query = "from Person")
+	@org.hibernate.annotations.NamedNativeQuery(name = "ormNative", query = "select * from persons")
 	public static class Person {
 		@Id
 		private Integer id;

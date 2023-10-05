@@ -119,28 +119,53 @@ public class GlobalAnnotationProcessor {
 
 	private void processNamedQuery(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( JpaAnnotations.NAMED_QUERY, (usage) -> {
-			// todo (models)  : implement
+			resultCollector.collectNamedQuery( new NamedQuery(
+					usage.extractAttributeValue( "name" ),
+					NamedQuery.Kind.HQL,
+					true,
+					usage
+			) );
 		} );
 
 		annotationTarget.forEachAnnotation( HibernateAnnotations.NAMED_QUERY, (usage) -> {
-			// todo (models)  : implement
+			resultCollector.collectNamedQuery( new NamedQuery(
+					usage.extractAttributeValue( "name" ),
+					NamedQuery.Kind.HQL,
+					false,
+					usage
+			) );
 		} );
 	}
 
 	private void processNamedNativeQuery(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( JpaAnnotations.NAMED_NATIVE_QUERY, (usage) -> {
-			// todo (models)  : implement
+			resultCollector.collectNamedQuery( new NamedQuery(
+					usage.extractAttributeValue( "name" ),
+					NamedQuery.Kind.NATIVE,
+					true,
+					usage
+			) );
 		} );
 
 		annotationTarget.forEachAnnotation( HibernateAnnotations.NAMED_NATIVE_QUERY, (usage) -> {
-			// todo (models)  : implement
+			resultCollector.collectNamedQuery( new NamedQuery(
+					usage.extractAttributeValue( "name" ),
+					NamedQuery.Kind.NATIVE,
+					false,
+					usage
+			) );
 		} );
 	}
 
 
 	private void processNamedProcedureQuery(AnnotationTarget annotationTarget) {
 		annotationTarget.forEachAnnotation( JpaAnnotations.NAMED_STORED_PROCEDURE_QUERY, (usage) -> {
-			// todo (models) : implement
+			resultCollector.collectNamedQuery( new NamedQuery(
+					usage.extractAttributeValue( "name" ),
+					NamedQuery.Kind.CALLABLE,
+					true,
+					usage
+			) );
 		} );
 	}
 

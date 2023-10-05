@@ -29,6 +29,9 @@ public class ProcessResultImpl implements ProcessResult {
 	private final List<CollectionTypeRegistration> collectionTypeRegistrations;
 	private final List<EmbeddableInstantiatorRegistration> embeddableInstantiatorRegistrations;
 	private final Map<String, IdGeneratorRegistration> globalIdGeneratorRegistrations;
+	private final Map<String, NamedQuery> jpaNamedQueries;
+	private final Map<String, NamedQuery> hibernateNamedHqlQueries;
+	private final Map<String, NamedQuery> hibernateNamedNativeQueries;
 
 	public ProcessResultImpl(
 			Set<EntityHierarchy> entityHierarchies,
@@ -40,7 +43,10 @@ public class ProcessResultImpl implements ProcessResult {
 			List<CompositeUserTypeRegistration> compositeUserTypeRegistrations,
 			List<CollectionTypeRegistration> collectionTypeRegistrations,
 			List<EmbeddableInstantiatorRegistration> embeddableInstantiatorRegistrations,
-			Map<String, IdGeneratorRegistration> globalIdGeneratorRegistrations) {
+			Map<String, IdGeneratorRegistration> globalIdGeneratorRegistrations,
+			Map<String, NamedQuery> jpaNamedQueries,
+			Map<String, NamedQuery> hibernateNamedHqlQueries,
+			Map<String, NamedQuery> hibernateNamedNativeQueries) {
 		this.entityHierarchies = entityHierarchies;
 		this.javaTypeRegistrations = javaTypeRegistrations;
 		this.jdbcTypeRegistrations = jdbcTypeRegistrations;
@@ -51,6 +57,9 @@ public class ProcessResultImpl implements ProcessResult {
 		this.collectionTypeRegistrations = collectionTypeRegistrations;
 		this.embeddableInstantiatorRegistrations = embeddableInstantiatorRegistrations;
 		this.globalIdGeneratorRegistrations = globalIdGeneratorRegistrations;
+		this.jpaNamedQueries = jpaNamedQueries;
+		this.hibernateNamedHqlQueries = hibernateNamedHqlQueries;
+		this.hibernateNamedNativeQueries = hibernateNamedNativeQueries;
 	}
 
 	@Override
@@ -101,5 +110,20 @@ public class ProcessResultImpl implements ProcessResult {
 	@Override
 	public Map<String, IdGeneratorRegistration> getGlobalIdGeneratorRegistrations() {
 		return globalIdGeneratorRegistrations;
+	}
+
+	@Override
+	public Map<String, NamedQuery> getJpaNamedQueries() {
+		return jpaNamedQueries;
+	}
+
+	@Override
+	public Map<String, NamedQuery> getHibernateNamedHqlQueries() {
+		return hibernateNamedHqlQueries;
+	}
+
+	@Override
+	public Map<String, NamedQuery> getHibernateNamedNativeQueries() {
+		return hibernateNamedNativeQueries;
 	}
 }

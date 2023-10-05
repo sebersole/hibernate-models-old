@@ -16,6 +16,7 @@ import java.util.Set;
 import org.hibernate.metamodel.CollectionClassification;
 import org.hibernate.models.orm.process.spi.ProcessResult;
 import org.hibernate.models.orm.spi.EntityHierarchy;
+import org.hibernate.models.source.ModelsException;
 import org.hibernate.models.source.spi.AnnotationUsage;
 import org.hibernate.models.source.spi.ClassDetails;
 
@@ -35,6 +36,10 @@ public class ProcessResultCollector {
 	private List<EmbeddableInstantiatorRegistration> embeddableInstantiatorRegistrations;
 	private Map<String, IdGeneratorRegistration> globalIdGeneratorRegistrations;
 	private List<ClassDetails> autoAppliedConverters;
+	private Map<String, NamedQuery> jpaNamedQueries;
+	private Map<String, NamedQuery> hibernateNamedHqlQueries;
+	private Map<String, NamedQuery> hibernateNamedNativeQueries;
+
 
 	public List<JavaTypeRegistration> getJavaTypeRegistrations() {
 		return javaTypeRegistrations;
@@ -134,6 +139,56 @@ public class ProcessResultCollector {
 		globalIdGeneratorRegistrations.put( name, new IdGeneratorRegistration( name, kind, annotation ) );
 	}
 
+	public void collectNamedQuery(NamedQuery query) {
+		if ( query.isJpa() ) {
+			// JPA queries must be unique across all types
+			collectJpaNamedQuery( query );
+		}
+		else {
+			// Hibernate named queries can use the same name across named HQL and named native queries
+			if ( query.getKind() == NamedQuery.Kind.HQL ) {
+				collectHibernateNamedHqlQuery( query );
+			}
+			else if ( query.getKind() == NamedQuery.Kind.NATIVE ) {
+				collectHibernateNamedNativeQuery( query );
+			}
+			else {
+				throw new ModelsException( "Unexpected query kind : " + query.getKind() );
+			}
+		}
+	}
+
+	private void collectJpaNamedQuery(NamedQuery query) {
+		assert query.isJpa();
+		if ( jpaNamedQueries == null ) {
+			jpaNamedQueries = new HashMap<>();
+		}
+		final NamedQuery previous = jpaNamedQueries.put( query.getName(), query );
+		if ( previous != null ) {
+			throw new ModelsException( "Duplicate JPA named-query: " + query.getName() );
+		}
+	}
+
+	private void collectHibernateNamedHqlQuery(NamedQuery query) {
+		if ( hibernateNamedHqlQueries == null ) {
+			hibernateNamedHqlQueries = new HashMap<>();
+		}
+		final NamedQuery previous = hibernateNamedHqlQueries.put( query.getName(), query );
+		if ( previous != null ) {
+			throw new ModelsException( "Duplicate Hibernate named HQL query: " + query.getName() );
+		}
+	}
+
+	private void collectHibernateNamedNativeQuery(NamedQuery query) {
+		if ( hibernateNamedNativeQueries == null ) {
+			hibernateNamedNativeQueries = new HashMap<>();
+		}
+		final NamedQuery previous = hibernateNamedNativeQueries.put( query.getName(), query );
+		if ( previous != null ) {
+			throw new ModelsException( "Duplicate Hibernate named native query: " + query.getName() );
+		}
+	}
+
 	public ProcessResult createResult(Set<EntityHierarchy> entityHierarchies) {
 		return new ProcessResultImpl(
 				entityHierarchies,
@@ -145,7 +200,10 @@ public class ProcessResultCollector {
 				compositeUserTypeRegistrations == null ? emptyList() : compositeUserTypeRegistrations,
 				collectionTypeRegistrations == null ? emptyList() : collectionTypeRegistrations,
 				embeddableInstantiatorRegistrations == null ? emptyList() : embeddableInstantiatorRegistrations,
-				globalIdGeneratorRegistrations == null ? emptyMap() : globalIdGeneratorRegistrations
+				globalIdGeneratorRegistrations == null ? emptyMap() : globalIdGeneratorRegistrations,
+				jpaNamedQueries == null ? emptyMap() : jpaNamedQueries,
+				hibernateNamedHqlQueries == null ? emptyMap() : hibernateNamedHqlQueries,
+				hibernateNamedNativeQueries == null ? emptyMap() : hibernateNamedNativeQueries
 		);
 	}
 }

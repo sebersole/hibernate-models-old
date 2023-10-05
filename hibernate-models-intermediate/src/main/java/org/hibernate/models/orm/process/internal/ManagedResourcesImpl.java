@@ -58,32 +58,36 @@ public class ManagedResourcesImpl implements ManagedResources {
 		private List<Class<?>> loadedClasses;
 		private List<String> xmlMappings;
 
-		public void addPackages(String... names) {
+		public Builder addPackages(String... names) {
 			if ( packageNames == null ) {
 				packageNames = new ArrayList<>();
 			}
 			Collections.addAll( packageNames, names );
+			return this;
 		}
 
-		public void addClassNames(String... names) {
+		public Builder addClassNames(String... names) {
 			if ( classNames == null ) {
 				classNames = new ArrayList<>();
 			}
 			Collections.addAll( classNames, names );
+			return this;
 		}
 
-		public void addLoadedClasses(Class<?>... classes) {
+		public Builder addLoadedClasses(Class<?>... classes) {
 			if ( loadedClasses == null ) {
 				loadedClasses = new ArrayList<>();
 			}
 			Collections.addAll( loadedClasses, classes );
+			return this;
 		}
 
-		public void addXmlMappings(String... names) {
+		public Builder addXmlMappings(String... names) {
 			if ( xmlMappings == null ) {
 				xmlMappings = new ArrayList<>();
 			}
 			Collections.addAll( xmlMappings, names );
+			return this;
 		}
 
 		public ManagedResources build() {

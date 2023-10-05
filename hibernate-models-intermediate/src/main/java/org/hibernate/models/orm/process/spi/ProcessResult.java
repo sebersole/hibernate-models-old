@@ -17,6 +17,7 @@ import org.hibernate.models.orm.process.internal.EmbeddableInstantiatorRegistrat
 import org.hibernate.models.orm.process.internal.IdGeneratorRegistration;
 import org.hibernate.models.orm.process.internal.JavaTypeRegistration;
 import org.hibernate.models.orm.process.internal.JdbcTypeRegistration;
+import org.hibernate.models.orm.process.internal.NamedQuery;
 import org.hibernate.models.orm.process.internal.UserTypeRegistration;
 import org.hibernate.models.orm.spi.EntityHierarchy;
 import org.hibernate.models.source.spi.ClassDetails;
@@ -46,4 +47,10 @@ public interface ProcessResult {
 	List<EmbeddableInstantiatorRegistration> getEmbeddableInstantiatorRegistrations();
 
 	Map<String, IdGeneratorRegistration> getGlobalIdGeneratorRegistrations();
+
+	Map<String, NamedQuery> getJpaNamedQueries();
+
+	Map<String, NamedQuery> getHibernateNamedHqlQueries();
+
+	Map<String, NamedQuery> getHibernateNamedNativeQueries();
 }
